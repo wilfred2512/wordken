@@ -1,0 +1,266 @@
+/* =============================================================================
+   Segunda capa de efectos: que NADA de la interfaz se quede quieto.
+
+   Va aparte de efectos.css a propósito. efectos.css tiene los efectos de la
+   partida (golpes, partículas, carteles); este archivo tiene la reacción de
+   los controles: botones, barras, fichas, teclado y transiciones.
+   ========================================================================== */
+
+/* ---------- Botones: barrido de luz al pasar por encima ---------- */
+.boton {
+  overflow: hidden;
+}
+
+/* El barrido va POR ENCIMA del texto, no detrás: con z-index negativo
+   quedaría tapado por el propio fondo del botón y no se vería nada.
+
+   Es una BANDA que cruza el botón, no un degradado que se desplaza: antes
+   esto animaba `background-position`, que obliga a repintar el botón entero
+   en cada fotograma. Moviendo la banda con `transform` el trabajo se lo
+   queda la tarjeta gráfica y el recorte lo pone el `overflow: hidden`. */
+.boton::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+  width: 55%;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateX(-140%) skewX(-18deg);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+}
+
+.boton:hover:not(:disabled)::before { animation: barrido-boton 0.6s ease-out; }
+
+@keyframes barrido-boton {
+  0% { opacity: 1; transform: translateX(-140%) skewX(-18deg); }
+  100% { opacity: 0; transform: translateX(320%) skewX(-18deg); }
+}
+
+/* El botón del duelo, cuando está listo, además respira color. */
+.boton-duelo.listo::before {
+  animation: barrido-boton 1.6s ease-out infinite;
+}
+
+/* ---------- Botón de sonido ---------- */
+.boton-sonido:active { transform: scale(0.9) rotate(-12deg); }
+
+/* ---------- Atajos y opciones del formulario ---------- */
+.atajo-vida:active,
+.selector .opcion:active { transform: translateY(2px) scale(0.96); }
+
+.selector .opcion.activa { animation: brinco-opcion 0.35s cubic-bezier(0.2, 1.7, 0.4, 1); }
+
+@keyframes brinco-opcion {
+  0% { transform: scale(0.88); }
+  60% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+/* ---------- Barras de vida: brillo que las recorre ----------
+   El brillo se mueve con `transform` y NO con `background-position`.
+   Animar la posición de un fondo obliga al navegador a repintar el elemento
+   entero en cada fotograma, y estas barras ocupan todo el ancho y están
+   siempre en pantalla: era de lo más caro de todo el juego. Con `transform`
+   el trabajo se lo lleva la tarjeta gráfica. */
+.barra::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -45%;
+  z-index: 2;
+  width: 45%;
+  pointer-events: none;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  will-change: transform;
+  animation: destello-barra 3.6s ease-in-out infinite;
+}
+
+@keyframes destello-barra {
+  0%, 62% { transform: translateX(0); }
+  100% { transform: translateX(330%); }
+}
+
+/* ---------- Panel golpeado: borde rojo además del fondo ---------- */
+.hud.es-golpeado { animation: golpe-hud 0.35s ease, borde-golpe 0.35s ease; }
+
+@keyframes borde-golpe {
+  0%, 100% { border-color: rgba(0, 0, 0, 0.35); }
+  30% { border-color: var(--rojo); box-shadow: 0 0 26px rgba(254, 95, 85, 0.6); }
+}
+
+/* ---------- Insignia de cadena ---------- */
+.insignia-cadena { transition: transform 0.2s cubic-bezier(0.2, 1.6, 0.4, 1), box-shadow 0.25s; }
+.insignia-cadena.nivel2 { box-shadow: 0 0 18px rgba(0, 157, 255, 0.7); }
+.insignia-cadena.nivel3 { box-shadow: 0 0 24px rgba(255, 159, 28, 0.85); }
+
+/* ---------- Número de ronda: brinca al cambiar ---------- */
+.ficha-ronda b { display: inline-block; }
+.ficha-ronda b.cambia { animation: brinco-ronda 0.45s cubic-bezier(0.2, 1.7, 0.4, 1); }
+
+@keyframes brinco-ronda {
+  0% { transform: scale(2) rotate(-14deg); color: var(--crema); }
+  60% { transform: scale(0.9); }
+  100% { transform: scale(1); }
+}
+
+/* ---------- Cartas grandes de la arena ---------- */
+.carta-grande.gana {
+  animation: celebra-carta 0.6s cubic-bezier(0.2, 1.6, 0.4, 1);
+}
+
+@keyframes celebra-carta {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.16) rotate(3deg); }
+  100% { transform: scale(1); }
+}
+
+.carta-grande.pierde { animation: hunde-carta 0.5s ease both; }
+
+@keyframes hunde-carta {
+  0% { transform: scale(1); }
+  100% { transform: scale(0.9) translateY(8px) rotate(-3deg); }
+}
+
+/* ---------- Sellos: latido permanente cuando están puestos ----------
+   El resplandor es un pseudo-elemento al que se le anima la OPACIDAD, no el
+   `box-shadow` del sello: animar sombras obliga a recalcular el pintado en
+   cada fotograma, y hay seis sellos en pantalla a la vez. */
+.sello.activo { animation: sello-brinca 0.45s cubic-bezier(0.2, 1.7, 0.4, 1); }
+
+.sello { position: relative; }
+
+.sello.activo::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 10px;
+  pointer-events: none;
+  box-shadow: 0 0 20px rgba(169, 108, 255, 1);
+  animation: late-sello 2.2s ease-in-out infinite;
+}
+
+@keyframes late-sello {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 1; }
+}
+
+/* ---------- Marcas del historial ---------- */
+.marca-historial { transition: transform 0.15s cubic-bezier(0.2, 1.6, 0.4, 1); }
+.marca-historial:hover { transform: scale(1.35) rotate(-8deg); z-index: 2; }
+.marca-historial:last-child { box-shadow: 0 0 12px currentColor; }
+
+/* ---------- Cartas del menú: se inclinan al pasar ---------- */
+.carta-mini { transition: transform 0.2s cubic-bezier(0.2, 1.6, 0.4, 1), box-shadow 0.2s; }
+
+.carta-mini:hover {
+  animation-play-state: paused;
+  transform: translateY(-18px) scale(1.12) rotate(0deg);
+  box-shadow: 0 18px 0 rgba(0, 0, 0, 0.3), 0 0 34px currentColor;
+}
+
+/* ---------- Teclado del duelo ---------- */
+.tecla { position: relative; overflow: hidden; }
+.tecla:active { transform: translateY(3px) scale(0.94); }
+.tecla.correcta,
+.tecla.posicion { animation: brinco-tecla 0.4s cubic-bezier(0.2, 1.7, 0.4, 1); }
+
+@keyframes brinco-tecla {
+  0% { transform: scale(0.7); }
+  60% { transform: scale(1.18); }
+  100% { transform: scale(1); }
+}
+
+/* ---------- Casillas del duelo ---------- */
+.casilla-duelo.escrita { animation: brinco-casilla 0.18s cubic-bezier(0.2, 1.8, 0.4, 1); }
+
+@keyframes brinco-casilla {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.18); }
+  100% { transform: scale(1.06); }
+}
+
+.casilla-duelo.correcta { box-shadow: 0 0 18px rgba(53, 189, 134, 0.8); }
+.casilla-duelo.posicion { box-shadow: 0 0 18px rgba(255, 210, 63, 0.7); }
+
+/* ---------- Reloj del duelo ---------- */
+.duelo-reloj.apurado {
+  color: var(--rojo);
+  text-shadow: 0 0 20px var(--rojo);
+  animation: late-reloj 0.5s ease-in-out infinite;
+}
+
+/* El halo rojo se deja fijo en la regla de arriba; aquí solo late el tamaño.
+   Un `text-shadow` animado repinta el texto en cada fotograma, y el reloj
+   apurado es justo el momento en que menos se puede permitir un tirón. */
+@keyframes late-reloj {
+  50% { transform: scale(1.18); }
+}
+
+/* ---------- Pistas del duelo ---------- */
+.pista-duelo { transition: border-color 0.3s, background 0.3s; }
+.pista-duelo.recien-abierta { animation: abre-pista 0.7s cubic-bezier(0.2, 1.6, 0.4, 1); }
+
+@keyframes abre-pista {
+  0% { transform: scale(0.8) translateY(-10px); opacity: 0; box-shadow: 0 0 40px var(--amarillo); }
+  60% { transform: scale(1.06); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+/* ---------- Tabla de puntuaciones ---------- */
+.fila-ranking { transition: transform 0.14s, box-shadow 0.2s; }
+.fila-ranking:not(.cabecera):hover { transform: translateX(6px) scale(1.01); box-shadow: 0 0 18px rgba(0, 0, 0, 0.5); }
+/* El dorado del primer puesto es una capa fija a la que se le mueve la
+   opacidad. Con `box-shadow` animado, una tabla abierta repintaba la fila
+   entera sesenta veces por segundo sin que nadie la estuviera mirando. */
+.fila-ranking.puesto-1 { position: relative; }
+
+.fila-ranking.puesto-1::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: 0 0 26px rgba(255, 210, 63, 0.75);
+  animation: halo-ranking 2.4s ease-in-out infinite;
+}
+
+@keyframes halo-ranking {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 1; }
+}
+
+/* ---------- Tarjeta de fin: la cinta ondea ----------
+   El `letter-spacing` de antes era lo más caro de todo el archivo: cambiar
+   el espaciado de un texto obliga a recalcular el DISEÑO de la página, no
+   solo a repintarla. `scaleX` da el mismo estirón y no toca el diseño. */
+.cinta-fin { animation: ondea-cinta 2.6s ease-in-out infinite; }
+
+@keyframes ondea-cinta {
+  50% { transform: scaleX(1.04); filter: brightness(1.25); }
+}
+
+.dato-final { animation: entra-dato 0.5s cubic-bezier(0.2, 1.6, 0.4, 1) both; }
+.dato-final:nth-child(2) { animation-delay: 0.05s; }
+.dato-final:nth-child(3) { animation-delay: 0.1s; }
+.dato-final:nth-child(4) { animation-delay: 0.15s; }
+.dato-final:nth-child(5) { animation-delay: 0.2s; }
+.dato-final:nth-child(6) { animation-delay: 0.25s; }
+.dato-final:nth-child(7) { animation-delay: 0.3s; }
+.dato-final:nth-child(8) { animation-delay: 0.35s; }
+
+@keyframes entra-dato {
+  0% { opacity: 0; transform: translateY(14px) scale(0.85); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ---------- Ventana de pausa: el fondo se oscurece más ---------- */
+#modal-pausa { background: rgba(4, 8, 12, 0.86); backdrop-filter: blur(6px) saturate(0.5); }
+#modal-pausa .tarjeta-modal { animation: entra-pausa 0.4s cubic-bezier(0.2, 1.6, 0.4, 1) both; }
+
+@keyframes entra-pausa {
+  0% { opacity: 0; transform: scale(0.7) rotate(-3deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0); }
+}

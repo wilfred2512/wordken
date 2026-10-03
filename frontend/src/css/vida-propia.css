@@ -1,0 +1,246 @@
+/* =============================================================================
+   VIDA PROPIA: lo que se mueve aunque nadie lo toque.
+
+   efectos.css tiene los golpes de la partida y efectos-interfaz.css la
+   reacción de los controles. Este archivo es el tercero y el más tonto de
+   los tres: aquí está lo que respira, late y parpadea SOLO, sin que haya
+   pasado nada. Es lo que separa una pantalla de un juego encendido.
+
+   Todo se anima con `transform`, `opacity` y `filter` —las tres propiedades
+   que se resuelven en la tarjeta gráfica— y las animaciones infinitas se
+   quedan en periodos largos y amplitudes pequeñas: si todo se moviera mucho
+   a la vez, la pantalla sería ilegible y el portátil del equipo se quejaría.
+   ========================================================================== */
+
+/* ---------- Menú: cada letra del título flota a su aire ----------
+   Los retrasos van por posición y no todos iguales, que es lo que hace que
+   parezca un rótulo colgando y no un bloque subiendo y bajando. */
+.logotipo-titulo .letra {
+  display: inline-block;
+  animation: letra-flota 1.8s cubic-bezier(0.3, 0.7, 0.4, 1) infinite;
+}
+
+/* Un retardo por posición: la ola recorre la palabra de izquierda a derecha. */
+.logotipo-titulo .letra:nth-child(2) { animation-delay: 0.09s; }
+.logotipo-titulo .letra:nth-child(3) { animation-delay: 0.18s; }
+.logotipo-titulo .letra:nth-child(4) { animation-delay: 0.27s; }
+.logotipo-titulo .letra:nth-child(5) { animation-delay: 0.36s; }
+.logotipo-titulo .letra:nth-child(6) { animation-delay: 0.45s; }
+.logotipo-titulo .letra:nth-child(7) { animation-delay: 0.54s; }
+.logotipo-titulo .letra:nth-child(8) { animation-delay: 0.63s; }
+
+/* Se agacha, salta estirada y cae aplastándose: así rebota algo con peso. */
+@keyframes letra-flota {
+  0%, 62%, 100% { transform: translateY(0) scale(1, 1) rotate(0deg); }
+  14% { transform: translateY(0) scale(1.16, 0.84); }
+  30% { transform: translateY(-24px) scale(0.9, 1.14) rotate(-7deg); }
+  46% { transform: translateY(0) scale(1.12, 0.88) rotate(2deg); }
+}
+
+.logotipo-titulo .letra:hover {
+  animation: letra-salta 0.5s cubic-bezier(0.2, 1.8, 0.4, 1);
+}
+
+@keyframes letra-salta {
+  0% { transform: translateY(0) scale(1); }
+  45% { transform: translateY(-20px) scale(1.3) rotate(-8deg); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+.logotipo-encima,
+.logotipo-lema { animation: respira-suave 4.5s ease-in-out infinite; }
+
+/* Solo opacidad. El `letter-spacing` que había aquí obligaba al navegador a
+   recalcular el diseño de la página en cada fotograma, y como esto también
+   corre sobre `.hud-nombre`, se pagaba durante TODA la partida. */
+@keyframes respira-suave {
+  0%, 100% { opacity: 0.72; }
+  50% { opacity: 1; }
+}
+
+/* El pie del menú aparece escribiéndose, una vez. */
+.pie-menu { animation: entra-abajo 0.9s ease-out 0.3s both; }
+
+@keyframes entra-abajo {
+  0% { opacity: 0; transform: translateY(14px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Los botones del menú entran escalonados al abrir la pantalla. */
+.botones-menu .boton { animation: entra-abajo 0.55s cubic-bezier(0.2, 1.5, 0.4, 1) both; }
+.botones-menu .boton:nth-child(2) { animation-delay: 0.08s; }
+.botones-menu .boton:nth-child(3) { animation-delay: 0.16s; }
+
+/* ---------- Medidor de carga: el aro gira despacio ---------- */
+.medidor { position: relative; }
+
+.medidor::after {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  border: 2px dashed rgba(169, 108, 255, 0.35);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: aro-gira 9s linear infinite;
+}
+
+@keyframes aro-gira {
+  to { transform: rotate(360deg); }
+}
+
+/* Lleno del todo, el aro se enciende y acelera: se ve desde el otro lado. */
+.medidor.lleno::after {
+  border-color: var(--amarillo);
+  border-style: solid;
+  animation-duration: 2.2s;
+}
+
+/* ---------- Partida: detalles que laten ---------- */
+.hud-nombre { animation: respira-suave 6s ease-in-out infinite; }
+
+/* La ficha de dificultad da un latido cada tanto, para que se lea a quién
+   te estás enfrentando sin tener que buscarlo. */
+.hud-dificultad { animation: ficha-late 5s ease-in-out infinite; }
+
+@keyframes ficha-late {
+  0%, 92%, 100% { transform: scale(1); }
+  96% { transform: scale(1.12); filter: brightness(1.4); }
+}
+
+/* Las cartas de la arena NO se animan aquí a propósito: su `transform` lo
+   manda partida.css (el giro de reposo) y lo relevan las animaciones de
+   revelar, ganar y perder. Una animación infinita más sobre la misma
+   propiedad se las comería, porque este archivo se carga el último. */
+
+/* ---------- Duelo: la pantalla más quieta del juego, ya no ---------- */
+/* El resplandor morado se queda puesto en una capa aparte y lo que late es
+   su opacidad: animar `text-shadow` repinta el rótulo en cada fotograma. */
+.duelo-rotulo {
+  position: relative;
+  text-shadow: 0 3px 0 rgba(0, 0, 0, 0.45);
+}
+
+.duelo-rotulo::after {
+  content: "";
+  position: absolute;
+  inset: -40% -8%;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(ellipse, rgba(169, 108, 255, 0.5), transparent 70%);
+  animation: rotulo-brilla 3.2s ease-in-out infinite;
+}
+
+@keyframes rotulo-brilla {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}
+
+/* La barra de tiempo lleva un brillo que la recorre: se ve que corre. */
+.carril-tiempo { position: relative; }
+
+.carril-tiempo::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -30%;
+  width: 30%;
+  pointer-events: none;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+  animation: destello-tiempo 2.6s ease-in-out infinite;
+}
+
+@keyframes destello-tiempo {
+  0%, 55% { transform: translateX(0); }
+  100% { transform: translateX(460%); }
+}
+
+/* Las fichas de datos entran escalonadas al abrirse el duelo. */
+.datos-duelo .dato { animation: entra-dato-duelo 0.5s cubic-bezier(0.2, 1.6, 0.4, 1) both; }
+.datos-duelo .dato:nth-child(2) { animation-delay: 0.06s; }
+.datos-duelo .dato:nth-child(3) { animation-delay: 0.12s; }
+.datos-duelo .dato:nth-child(4) { animation-delay: 0.18s; }
+
+@keyframes entra-dato-duelo {
+  0% { opacity: 0; transform: translateY(-12px) scale(0.9); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* El tablero entra fila a fila, de arriba abajo. */
+.fila-duelo { animation: entra-fila 0.45s cubic-bezier(0.2, 1.5, 0.4, 1) both; }
+.fila-duelo:nth-child(2) { animation-delay: 0.05s; }
+.fila-duelo:nth-child(3) { animation-delay: 0.1s; }
+.fila-duelo:nth-child(4) { animation-delay: 0.15s; }
+.fila-duelo:nth-child(5) { animation-delay: 0.2s; }
+
+@keyframes entra-fila {
+  0% { opacity: 0; transform: translateX(-22px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+/* La fila en la que estás escribiendo se distingue sin leer nada. */
+.fila-duelo:has(.casilla-duelo.escrita) .casilla-duelo { border-color: rgba(255, 255, 255, 0.4); }
+
+/* Las teclas entran en cascada, de izquierda a derecha. */
+.fila-teclado .tecla { animation: entra-tecla 0.3s ease-out both; }
+.fila-teclado .tecla:nth-child(2) { animation-delay: 0.02s; }
+.fila-teclado .tecla:nth-child(3) { animation-delay: 0.04s; }
+.fila-teclado .tecla:nth-child(4) { animation-delay: 0.06s; }
+.fila-teclado .tecla:nth-child(5) { animation-delay: 0.08s; }
+.fila-teclado .tecla:nth-child(6) { animation-delay: 0.1s; }
+.fila-teclado .tecla:nth-child(7) { animation-delay: 0.12s; }
+.fila-teclado .tecla:nth-child(8) { animation-delay: 0.14s; }
+.fila-teclado .tecla:nth-child(9) { animation-delay: 0.16s; }
+.fila-teclado .tecla:nth-child(10) { animation-delay: 0.18s; }
+
+@keyframes entra-tecla {
+  0% { opacity: 0; transform: translateY(14px) scale(0.85); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.tecla:hover:not(:active) { transform: translateY(-2px); }
+
+/* La pista, mientras está cerrada, palpita despacio para que se vea que se
+   va a abrir sola y no es un hueco muerto. */
+.pista-duelo.oculta { animation: pista-espera 2.8s ease-in-out infinite; }
+
+@keyframes pista-espera {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 0.85; }
+}
+
+/* ---------- Tarjeta de fin ----------
+   La cinta ya ondea desde efectos-interfaz.css; aquí solo respira el título. */
+#titulo-fin { animation: titulo-fin-late 2.4s ease-in-out infinite; }
+
+@keyframes titulo-fin-late {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+}
+
+/* ---------- Mochilas: las fichas guardadas piden que las uses ----------
+   Se quedan quietas al pasar el cursor: una ficha que sigue botando mientras
+   intentas pulsarla es un blanco móvil, y estas son botones de verdad. */
+.ficha-poder.guardado { animation: ficha-pide 2.6s ease-in-out infinite; }
+.ficha-poder.guardado:hover { animation: none; }
+
+@keyframes ficha-pide {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+
+/* ---------- El fondo tiene grano que se mueve ----------
+   Una capa muy tenue encima de todo. Sin ella los degradados grandes se ven
+   planos, con bandas; con ella parecen tela. */
+/* El `inset` negativo es imprescindible: al moverla se vería el borde. */
+#fondo .lineas {
+  inset: -2%;
+  animation: grano 8s steps(4) infinite;
+}
+
+@keyframes grano {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(-1%, 1%); }
+  50% { transform: translate(1%, -1%); }
+  75% { transform: translate(-1%, -1%); }
+}

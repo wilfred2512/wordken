@@ -1,0 +1,23 @@
+# =============================================================================
+# Cómo guarda Git cada tipo de archivo, para que el proyecto funcione igual en
+# Windows, macOS y Linux sin importar quién haga el commit.
+# =============================================================================
+
+# Por defecto, texto con finales de línea LF dentro del repositorio.
+* text=auto eol=lf
+
+# El lanzador de Windows NECESITA CRLF: con LF, cmd.exe se come líneas y falla.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# El lanzador de macOS/Linux NECESITA LF: con CRLF, bash dice
+# "bad interpreter" o "$'\r': command not found".
+*.sh text eol=lf
+
+# Binarios: que Git no intente convertir nada dentro de ellos.
+*.mp3 binary
+*.png binary
+*.jpg binary
+*.webp binary
+*.ico binary
+*.db binary

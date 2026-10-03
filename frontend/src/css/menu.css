@@ -1,0 +1,164 @@
+/* =============================================================================
+   Pantalla del menú principal.
+   ========================================================================== */
+
+.envoltorio-menu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 26px;
+  height: 100%;
+  padding: 24px;
+}
+
+.logotipo { text-align: center; }
+
+.logotipo-encima {
+  margin-bottom: 12px;
+  font-size: 16px;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: var(--pizarra);
+}
+
+.logotipo-titulo {
+  display: flex;
+  justify-content: center;
+  gap: 0.06em;
+  font-family: var(--fuente-titular);
+  font-size: clamp(28px, 7vw, 64px);
+  line-height: 1;
+}
+
+/* El espacio entre palabras: un <span> vacío no ocupa nada por sí solo. */
+.logotipo-titulo .hueco-titulo { display: inline-block; width: 0.5em; }
+
+.logotipo-titulo .letra {
+  display: inline-block;
+  color: var(--crema);
+  text-shadow: 0 5px 0 rgba(0, 0, 0, 0.45), 0 0 26px rgba(255, 210, 63, 0.25);
+  animation: cabeceo 2.6s ease-in-out infinite;
+}
+
+/* Un color por letra, en ciclo de seis. */
+.logotipo-titulo .letra-0 { color: var(--rojo); animation-delay: 0s; }
+.logotipo-titulo .letra-1 { color: var(--naranja); animation-delay: 0.1s; }
+.logotipo-titulo .letra-2 { color: var(--amarillo); animation-delay: 0.2s; }
+.logotipo-titulo .letra-3 { color: var(--verde); animation-delay: 0.3s; }
+.logotipo-titulo .letra-4 { color: var(--azul); animation-delay: 0.4s; }
+.logotipo-titulo .letra-5 { color: var(--morado); animation-delay: 0.5s; }
+
+@keyframes cabeceo {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  50% { transform: translateY(-10px) rotate(-2deg); }
+}
+
+.logotipo-lema {
+  margin-top: 14px;
+  font-size: 15px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--crema-2);
+  opacity: 0.72;
+}
+
+.cartas-menu { display: flex; gap: 18px; }
+
+.carta-mini {
+  display: grid;
+  place-items: center;
+  width: 86px;
+  height: 118px;
+  border: 4px solid var(--tinta);
+  border-radius: 12px;
+  background: var(--papel);
+  box-shadow: var(--sombra);
+  animation: flotar 3.4s ease-in-out infinite;
+}
+
+.carta-mini:nth-child(2) { animation-delay: 0.35s; }
+.carta-mini:nth-child(3) { animation-delay: 0.7s; }
+.carta-mini svg { width: 58px; height: 58px; }
+
+@keyframes flotar {
+  0%, 100% { transform: translateY(0) rotate(-3deg); }
+  50% { transform: translateY(-14px) rotate(3deg); }
+}
+
+.botones-menu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.pie-menu {
+  font-size: 14px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--pizarra);
+}
+
+/* ---------- Tabla de puntuaciones ---------- */
+.tabla-ranking {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fila-ranking {
+  display: grid;
+  grid-template-columns: 2.2em 1fr 4.5em 4.5em 4.5em;
+  gap: 8px;
+  align-items: center;
+  padding: 0.5em 0.7em;
+  border-radius: 10px;
+  font-size: 16px;
+  background: rgba(0, 0, 0, 0.22);
+}
+
+.fila-ranking span:not(:nth-child(2)) { text-align: right; }
+
+.fila-ranking.cabecera {
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  color: var(--pizarra);
+  background: none;
+}
+
+.fila-ranking.puesto-1 { color: var(--tinta); background: var(--amarillo); font-weight: 700; }
+.fila-ranking.puesto-2 { background: rgba(124, 152, 173, 0.35); }
+.fila-ranking.puesto-3 { background: rgba(255, 159, 28, 0.3); }
+
+.ranking-vacio {
+  padding: 1.4em 0.6em;
+  text-align: center;
+  color: var(--pizarra);
+}
+
+/* Aviso con instrucciones cuando el backend no está levantado. */
+.ranking-apagado {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 1.1em;
+  border-left: 5px solid var(--naranja);
+  border-radius: 12px;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--crema-2);
+  background: rgba(255, 159, 28, 0.12);
+}
+
+.ranking-apagado strong { font-size: 17px; color: var(--naranja); }
+
+.ranking-apagado code {
+  display: block;
+  padding: 0.6em 0.8em;
+  border-radius: 8px;
+  font-family: "Consolas", "Courier New", monospace;
+  font-size: 14px;
+  color: var(--amarillo);
+  background: rgba(0, 0, 0, 0.45);
+}

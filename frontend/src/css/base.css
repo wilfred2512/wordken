@@ -1,0 +1,194 @@
+/* =============================================================================
+   Tokens, reinicio y fondo animado.
+   Estética inspirada en Balatro: colores planos saturados, bordes gruesos y
+   sombras inferiores que dan sensación de relieve.
+   ========================================================================== */
+
+:root {
+  --tinta: #14212b;
+  --tinta-suave: #24394a;
+
+  --fondo-0: #17242e;
+  --fondo-1: #1e3140;
+  --fondo-2: #263f52;
+
+  --crema: #f6efdd;
+  --crema-2: #e6dcc2;
+  --papel: #fffaf0;
+
+  --rojo: #fe5f55;
+  --rojo-oscuro: #b83a32;
+  --azul: #009dff;
+  --azul-oscuro: #0069ad;
+  --verde: #35bd86;
+  --verde-oscuro: #1f855c;
+  --naranja: #ff9f1c;
+  --naranja-oscuro: #c26f00;
+  --amarillo: #ffd23f;
+  --morado: #a96cff;
+  --morado-oscuro: #7440c4;
+  --pizarra: #7c98ad;
+
+  --fuente-interfaz: "Pixelify Sans", "Trebuchet MS", system-ui, sans-serif;
+  --fuente-titular: "Press Start 2P", "Pixelify Sans", monospace;
+
+  --radio: 14px;
+  --sombra: 0 10px 0 rgba(0, 0, 0, 0.28), 0 18px 34px rgba(0, 0, 0, 0.42);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: var(--fuente-interfaz);
+  font-size: 17px;
+  background: var(--fondo-0);
+  color: var(--crema);
+  overflow: hidden;
+  -webkit-font-smoothing: none;
+}
+
+button {
+  font-family: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+input {
+  font-family: inherit;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+/* ---------- Fondo animado ---------- */
+#fondo {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background: radial-gradient(120% 90% at 50% 0%, var(--fondo-2), var(--fondo-0) 70%);
+}
+
+.mancha {
+  position: absolute;
+  width: 70vmax;
+  height: 70vmax;
+  border-radius: 50%;
+  filter: blur(70px);
+  opacity: 0.42;
+  mix-blend-mode: screen;
+}
+
+.mancha-1 {
+  top: -25%;
+  left: -20%;
+  background: #0f6fb8;
+  animation: deriva-1 26s ease-in-out infinite;
+}
+
+.mancha-2 {
+  right: -15%;
+  bottom: -30%;
+  background: #8a3a63;
+  animation: deriva-2 32s ease-in-out infinite;
+}
+
+.mancha-3 {
+  top: 25%;
+  right: -25%;
+  background: #1c8f74;
+  animation: deriva-3 38s ease-in-out infinite;
+}
+
+.mancha-4 {
+  bottom: -20%;
+  left: -20%;
+  opacity: 0.28;
+  background: #b8631f;
+  animation: deriva-1 44s ease-in-out infinite reverse;
+}
+
+@keyframes deriva-1 {
+  50% { transform: translate(18vw, 12vh) scale(1.18); }
+}
+
+@keyframes deriva-2 {
+  50% { transform: translate(-16vw, -14vh) scale(1.12); }
+}
+
+@keyframes deriva-3 {
+  50% { transform: translate(-12vw, 10vh) scale(0.88); }
+}
+
+.vineta {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(100% 80% at 50% 45%, transparent 40%, rgba(0, 0, 0, 0.62) 100%);
+}
+
+.lineas {
+  position: absolute;
+  inset: 0;
+  opacity: 0.16;
+  background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.6) 0 1px, transparent 1px 3px);
+}
+
+#aplicacion {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+}
+
+/* ---------- Pantallas ---------- */
+.pantalla {
+  position: absolute;
+  inset: 0;
+  display: none;
+}
+
+.pantalla.es-activa {
+  display: block;
+  animation: entrada-pantalla 0.38s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+}
+
+@keyframes entrada-pantalla {
+  from { opacity: 0; transform: scale(0.96) translateY(14px); }
+}
+
+/* Color propio de cada tirada. La especificidad extra es necesaria para
+   ganarle al `color` que heredan las cartas. */
+.m-piedra,
+.carta.m-piedra,
+.carta-grande.m-piedra,
+.cara.m-piedra { color: var(--azul); }
+
+.m-papel,
+.carta.m-papel,
+.carta-grande.m-papel,
+.cara.m-papel { color: var(--amarillo); }
+
+.m-tijera,
+.carta.m-tijera,
+.carta-grande.m-tijera,
+.cara.m-tijera { color: var(--rojo); }
+
+.m-pistola,
+.carta.m-pistola,
+.cara.m-pistola { color: var(--morado); }
+
+.m-escudo,
+.carta.m-escudo,
+.cara.m-escudo { color: var(--verde); }

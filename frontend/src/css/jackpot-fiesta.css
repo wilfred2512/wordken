@@ -1,0 +1,109 @@
+/* =============================================================================
+   JACKPOT (2/2): la fiesta. Lluvia de monedas, confeti, los letreros de
+   JACKPOT y MEGA JACKPOT, y la salida. La máquina está en jackpot.css.
+   ========================================================================== */
+
+/* =============================================================================
+   LLUVIA DE MONEDAS (desde el jackpot) Y CONFETI (desde el mega)
+   ========================================================================== */
+.jp-lluvia, .jp-confeti { inset: 0; pointer-events: none; }
+
+.jp-moneda, .jp-papelito { position: absolute; top: 0; left: var(--x); opacity: 0; }
+
+.jp-moneda {
+  width: 34px;
+  height: 34px;
+  border: 3px solid #8a5a00;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff6c2 0 12%, var(--oro) 30%, #e0a800 62%, #a86f00);
+}
+
+.fase-jackpot .jp-moneda {
+  opacity: 1;
+  animation: jp-cae var(--dur) linear var(--ret) infinite, jp-voltea 0.7s linear infinite;
+}
+
+.jp-papelito { width: 10px; height: 16px; border-radius: 2px; }
+.jp-papelito.c0 { background: var(--rojo); }
+.jp-papelito.c1 { background: var(--amarillo); }
+.jp-papelito.c2 { background: var(--verde); }
+.jp-papelito.c3 { background: var(--azul); }
+.jp-papelito.c4 { background: var(--morado); }
+
+.fase-mega .jp-papelito { opacity: 1; animation: jp-confeti var(--dur) linear var(--ret) infinite; }
+
+@keyframes jp-cae {
+  from { translate: 0 -10vh; rotate: 0deg; }
+  to { translate: 0 110vh; rotate: var(--giro); }
+}
+
+@keyframes jp-voltea { 0%, 100% { scale: 1 1; } 50% { scale: 0.15 1; } }
+
+@keyframes jp-confeti {
+  0% { translate: 0 -10vh; rotate: 0deg; }
+  50% { translate: 5vw 50vh; rotate: calc(var(--giro) / 2); }
+  100% { translate: -4vw 110vh; rotate: var(--giro); }
+}
+
+/* =============================================================================
+   LOS LETREROS
+   ========================================================================== */
+.jp-titulo, .jp-mega, .jp-subtitulo { text-align: center; color: var(--oro); paint-order: stroke fill; opacity: 0; }
+
+.jp-titulo { top: 4vh; font-size: clamp(34px, 8vmin, 86px); -webkit-text-stroke: 6px var(--tinta); }
+.fase-jackpot .jp-titulo { animation: jp-golpe 0.7s cubic-bezier(0.2, 1.6, 0.4, 1) both, jp-bota 1s ease-in-out 0.7s infinite; }
+
+@keyframes jp-golpe {
+  0% { opacity: 0; scale: 4; rotate: -20deg; }
+  60% { opacity: 1; scale: 0.9; rotate: 4deg; }
+  100% { opacity: 1; scale: 1; rotate: 0deg; }
+}
+
+@keyframes jp-bota {
+  0%, 100% { translate: 0 0; rotate: -3deg; }
+  50% { translate: 0 -12px; rotate: 3deg; }
+}
+
+.jp-mega {
+  width: 96vw;
+  font-size: clamp(34px, 9.5vmin, 110px);
+  color: #fff;
+  -webkit-text-stroke: 7px var(--casino);
+  rotate: -7deg;
+}
+
+.fase-mega .jp-mega { animation: jp-golpe 0.8s cubic-bezier(0.2, 1.6, 0.4, 1) both, jp-late 0.46s ease-in-out 0.8s infinite; }
+
+@keyframes jp-late { 0%, 100% { scale: 1; } 50% { scale: 1.1; } }
+
+.jp-subtitulo {
+  bottom: 10vh;
+  width: 92vw;
+  font-family: inherit;
+  font-size: clamp(11px, 2.2vmin, 18px);
+  letter-spacing: 0.08em;
+  color: var(--crema);
+  -webkit-text-stroke: 3px var(--tinta);
+}
+
+.fase-jackpot .jp-subtitulo { animation: jp-aparece 0.6s ease 0.4s both; }
+
+.jp-saltar { bottom: 3vh; font-size: 12px; letter-spacing: 0.1em; color: var(--crema-2); opacity: 0; }
+.saltable .jp-saltar { animation: jp-parpadea 1.4s ease-in-out infinite; }
+
+@keyframes jp-parpadea { 0%, 100% { opacity: 0.25; } 50% { opacity: 0.85; } }
+
+/* =============================================================================
+   SALIDA
+   ========================================================================== */
+#jackpot.fase-salida { animation: jp-fuera 1.2s ease forwards; }
+#jackpot.fase-salida-rapida { animation: jp-fuera 0.3s ease forwards; }
+
+@keyframes jp-fuera { to { opacity: 0; } }
+
+/* Con "reducir movimiento" se quitan el temblor y los fogonazos, pero el
+   velo se queda puesto: sin su animación de entrada seguiría transparente. */
+@media (prefers-reduced-motion: reduce) {
+  .jp-temblor, .jp-flash { animation: none !important; }
+  .jp-velo { animation: none !important; opacity: 1; }
+}

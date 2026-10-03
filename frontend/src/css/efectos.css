@@ -1,0 +1,269 @@
+/* =============================================================================
+   Efectos: congelación, golpe de cámara, destellos, combo, números de daño,
+   carteles y viñeta de peligro.
+
+   En la versión anterior del juego este CSS se inyectaba desde JavaScript.
+   Aquí está en su sitio: el enunciado prohíbe los estilos dentro del HTML y
+   de la lógica, y además así se puede retocar el jugo visual sin abrir el JS.
+   ========================================================================== */
+
+/* ---------- Lienzo de partículas ---------- */
+#lienzo-efectos {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+}
+
+/* ---------- Destello a pantalla completa ---------- */
+#fx-destello {
+  --color-destello: rgba(255, 255, 255, 0.3);
+  position: fixed;
+  inset: 0;
+  z-index: 38;
+  opacity: 0;
+  pointer-events: none;
+  background: var(--color-destello);
+}
+
+#fx-destello.activo { animation: destello 0.42s ease-out; }
+
+@keyframes destello {
+  0% { opacity: 0.85; }
+  100% { opacity: 0; }
+}
+
+/* ---------- Contador de combo ---------- */
+#fx-combo {
+  position: fixed;
+  z-index: 42;
+  top: 38%;
+  left: 50%;
+  opacity: 0;
+  text-align: center;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+#fx-combo.activo { animation: combo 0.95s cubic-bezier(0.2, 1.6, 0.4, 1); }
+
+#fx-combo b {
+  display: block;
+  font-family: var(--fuente-titular);
+  font-size: clamp(48px, 11vw, 120px);
+  line-height: 1;
+  color: var(--amarillo);
+  text-shadow: 0 8px 0 rgba(0, 0, 0, 0.5), 0 0 40px currentColor;
+}
+
+#fx-combo span {
+  display: block;
+  margin-top: 8px;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.4em;
+  color: #fff;
+  text-shadow: 0 3px 0 rgba(0, 0, 0, 0.5);
+}
+
+#fx-combo.es-rival b { color: var(--rojo); }
+
+@keyframes combo {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.3) rotate(-12deg); }
+  30% { opacity: 1; transform: translate(-50%, -50%) scale(1.25) rotate(4deg); }
+  45% { transform: translate(-50%, -50%) scale(1) rotate(-2deg); }
+  75% { opacity: 1; transform: translate(-50%, -58%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -78%) scale(0.9); }
+}
+
+/* ---------- Golpe de cámara ----------
+   El zoom y la sacudida van en UNA sola animación porque las dos usan
+   `transform`: dos animaciones peleándose por la misma propiedad se pisan y
+   solo se ve una. */
+#aplicacion.fx-golpe { animation: golpe 0.38s cubic-bezier(0.3, 1.4, 0.4, 1); }
+#aplicacion.fx-golpe-fuerte { animation: golpe-fuerte 0.6s cubic-bezier(0.3, 1.4, 0.4, 1); }
+
+@keyframes golpe {
+  0% { transform: scale(1); }
+  12% { transform: scale(1.035) translate(-8px, 5px); }
+  30% { transform: scale(1.02) translate(7px, -5px); }
+  55% { transform: scale(1.008) translate(-4px, 3px); }
+  100% { transform: scale(1); }
+}
+
+@keyframes golpe-fuerte {
+  0% { transform: scale(1); }
+  10% { transform: scale(1.075) translate(-14px, 9px) rotate(-0.7deg); }
+  26% { transform: scale(1.05) translate(12px, -8px) rotate(0.7deg); }
+  45% { transform: scale(1.03) translate(-8px, 5px); }
+  70% { transform: scale(1.012) translate(5px, -3px); }
+  100% { transform: scale(1); }
+}
+
+/* Sacudida sin zoom, para cuando el golpe de cámara está apagado. */
+@keyframes sacudida {
+  0%, 100% { transform: translate(0, 0); }
+  15% { transform: translate(-9px, 5px) rotate(-0.5deg); }
+  30% { transform: translate(8px, -6px) rotate(0.5deg); }
+  45% { transform: translate(-6px, -4px); }
+  60% { transform: translate(6px, 4px); }
+  80% { transform: translate(-3px, 2px); }
+}
+
+#aplicacion.fx-sacudida { animation: sacudida 0.38s ease-out; }
+#aplicacion.fx-sacudida-fuerte { animation: sacudida 0.6s ease-out; }
+
+/* ---------- Congelación del impacto ---------- */
+.fx-congelado { filter: contrast(1.5) saturate(1.5) brightness(1.15); }
+.fx-congelado * { animation-play-state: paused !important; }
+
+/* ---------- Números de daño ---------- */
+.numero-dano {
+  position: absolute;
+  z-index: 20;
+  font-family: var(--fuente-titular);
+  font-size: 26px;
+  color: var(--amarillo);
+  text-shadow: 0 4px 0 rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+  animation: sube-dano 1s ease-out forwards;
+}
+
+.numero-dano.grande { font-size: 38px; color: var(--naranja); }
+.numero-dano.enorme { font-size: 48px; color: var(--morado); }
+
+@keyframes sube-dano {
+  0% { opacity: 0; transform: translate(-50%, 0) scale(0.4); }
+  25% { opacity: 1; transform: translate(-50%, -24px) scale(1.25); }
+  100% { opacity: 0; transform: translate(-50%, -88px) scale(1); }
+}
+
+/* ---------- Carta vetada ---------- */
+.carta.vetada { filter: grayscale(1) brightness(0.45); cursor: not-allowed; animation: none; }
+
+.carta.vetada::before {
+  content: "\2715";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  font-size: 58px;
+  font-weight: 700;
+  color: var(--rojo);
+  text-shadow: 0 4px 0 rgba(0, 0, 0, 0.6);
+  animation: marca-veto 0.5s cubic-bezier(0.2, 1.7, 0.4, 1);
+}
+
+@keyframes marca-veto {
+  0% { opacity: 0; transform: scale(2.4) rotate(-20deg); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* ---------- Viñeta de peligro ----------
+   Antes esto era un `box-shadow: inset` animado a pantalla completa, y era
+   con diferencia lo más caro del juego: un box-shadow no se puede resolver
+   en la tarjeta gráfica, así que el navegador tenía que REPINTAR la ventana
+   entera sesenta veces por segundo. Y como la viñeta solo se enciende con la
+   vida baja, el juego se arrastraba justo en el tramo final de cada partida.
+
+   Ahora el rojo es un degradado FIJO y lo único que se anima es la opacidad,
+   que sí se resuelve en la tarjeta gráfica. Se ve igual y no cuesta nada. */
+body.en-peligro::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 35;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 42%, rgba(254, 95, 85, 0.62) 100%);
+  animation: peligro 1.6s ease-in-out infinite;
+}
+
+@keyframes peligro {
+  0%, 100% { opacity: 0.66; }
+  50% { opacity: 1; }
+}
+
+/* ---------- Carteles grandes ---------- */
+.cartel-cadena {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: none;
+  place-items: center;
+  pointer-events: none;
+}
+
+.cartel-cadena.visible { display: grid; }
+
+.cartel-interior {
+  padding: 20px 42px;
+  border: 6px solid var(--tinta);
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 14px 0 rgba(0, 0, 0, 0.35), 0 0 70px currentColor;
+  animation: entra-cartel 0.8s cubic-bezier(0.2, 1.6, 0.4, 1) both;
+}
+
+@keyframes entra-cartel {
+  0% { opacity: 0; transform: scale(0.3) rotate(-12deg); }
+  35% { opacity: 1; transform: scale(1.12) rotate(3deg); }
+  50% { transform: scale(1) rotate(-1deg); }
+  80% { opacity: 1; transform: scale(1) rotate(0); }
+  100% { opacity: 0; transform: scale(1.06); }
+}
+
+.cartel-titulo {
+  display: block;
+  font-family: var(--fuente-titular);
+  font-size: clamp(16px, 3.6vw, 32px);
+  letter-spacing: 0.04em;
+  color: #fff;
+  text-shadow: 0 6px 0 rgba(0, 0, 0, 0.45);
+}
+
+.cartel-subtitulo {
+  display: block;
+  margin-top: 10px;
+  font-size: 15px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.cf-nivel2 .cartel-interior { color: var(--azul); background: var(--azul); }
+.cf-nivel3 .cartel-interior { color: var(--naranja); background: var(--naranja); }
+.cf-sello .cartel-interior { color: var(--verde); background: var(--verde); }
+.cf-rota .cartel-interior { color: #4b5c69; background: #4b5c69; }
+.cf-bloqueo .cartel-interior { color: #4b5c69; background: #4b5c69; }
+.cf-umbral .cartel-interior { color: var(--morado); background: var(--morado); }
+.cf-poder .cartel-interior { color: var(--morado); background: var(--morado); }
+.cf-duelo .cartel-interior { color: var(--amarillo); background: var(--amarillo); }
+.cf-robo .cartel-interior { color: var(--rojo); background: var(--rojo); }
+
+/* El degradado se queda quieto y lo que gira es el TONO. Desplazar el
+   `background-position` obligaba a repintar el cartel en cada fotograma, y
+   este sale justo en el momento de más cosas en pantalla: la cadena máxima. */
+.cf-maxima .cartel-interior {
+  color: var(--morado);
+  background: linear-gradient(135deg, var(--morado), var(--rojo), var(--naranja));
+  animation: entra-cartel 1.6s cubic-bezier(0.2, 1.6, 0.4, 1) both, arcoiris 2.4s linear infinite;
+}
+
+@keyframes arcoiris { to { filter: hue-rotate(360deg); } }
+
+/* ---------- Destello blanco de la cadena máxima ---------- */
+#aplicacion.destello-maximo::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  pointer-events: none;
+  background: #fff;
+  animation: destello-blanco 1.2s ease-out forwards;
+}
+
+@keyframes destello-blanco {
+  0% { opacity: 0.95; }
+  100% { opacity: 0; }
+}

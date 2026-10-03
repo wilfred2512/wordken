@@ -1,0 +1,203 @@
+/* =============================================================================
+   Pantalla del duelo de palabras (el Wordle a contrarreloj).
+   ========================================================================== */
+
+.rejilla-duelo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  height: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 14px 16px 12px;
+}
+
+.cabecera-duelo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.duelo-rotulo {
+  font-family: var(--fuente-titular);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  color: var(--morado);
+  text-shadow: 0 3px 0 rgba(0, 0, 0, 0.45);
+}
+
+.duelo-rotulo b { color: var(--amarillo); }
+
+.duelo-reloj {
+  font-family: var(--fuente-titular);
+  font-size: 22px;
+  color: var(--crema);
+  text-shadow: 0 4px 0 rgba(0, 0, 0, 0.45);
+}
+
+.carril-tiempo {
+  width: 100%;
+  height: 12px;
+  border: 3px solid rgba(0, 0, 0, 0.5);
+  border-radius: 8px;
+  background: #0d1720;
+  overflow: hidden;
+}
+
+.barra-tiempo {
+  width: 100%;
+  height: 100%;
+  background: var(--verde);
+  transition: background 0.3s;
+}
+
+.barra-tiempo.apurado { background: var(--rojo); animation: latido-bajo 0.5s ease-in-out infinite; }
+
+.datos-duelo {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.datos-duelo .dato {
+  flex: 1;
+  min-width: 120px;
+  padding: 0.4em 0.7em;
+  border-radius: 10px;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.28);
+}
+
+.datos-duelo .dato span {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  color: var(--pizarra);
+}
+
+.datos-duelo .dato strong { font-size: 15px; color: var(--crema); }
+
+.pista-duelo {
+  max-width: 100%;
+  padding: 0.45em 1em;
+  border-left: 5px solid var(--amarillo);
+  border-radius: 10px;
+  font-size: 16px;
+  text-align: center;
+  color: var(--crema-2);
+  background: rgba(255, 210, 63, 0.12);
+}
+
+/* La pista extra, mientras no se ha ganado, se ve apagada y en cursiva. */
+.pista-duelo.oculta {
+  border-left-color: var(--pizarra);
+  color: var(--pizarra);
+  background: rgba(0, 0, 0, 0.2);
+  font-style: italic;
+}
+
+#pista-extra-duelo { border-left-color: var(--verde); background: rgba(53, 189, 134, 0.14); }
+
+/* Al perder, ese mismo recuadro pasa a enseñar la solución. */
+#pista-extra-duelo.solucion {
+  border-left-color: var(--rojo);
+  font-family: var(--fuente-titular);
+  font-size: 15px;
+  letter-spacing: 0.06em;
+  color: var(--papel);
+  background: rgba(254, 95, 85, 0.22);
+}
+
+/* ---------- Tablero ---------- */
+/* Los `auto` de aquí y del teclado reparten el hueco sobrante: el tablero
+   queda centrado y el teclado siempre pegado abajo, a mano en el móvil. */
+.tablero-duelo {
+  --columnas: 5;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: auto 0 0;
+}
+
+.fila-duelo {
+  display: grid;
+  grid-template-columns: repeat(var(--columnas), 1fr);
+  gap: 6px;
+}
+
+.fila-duelo.tiembla { animation: temblor-campo 0.34s ease; }
+
+.casilla-duelo {
+  display: grid;
+  place-items: center;
+  width: clamp(30px, 8vw, 52px);
+  aspect-ratio: 1;
+  border: 3px solid rgba(255, 255, 255, 0.16);
+  border-radius: 9px;
+  font-family: var(--fuente-titular);
+  font-size: clamp(11px, 3vw, 20px);
+  color: var(--crema);
+  background: rgba(0, 0, 0, 0.3);
+  transition: transform 0.12s, border-color 0.2s;
+}
+
+.casilla-duelo.escrita { border-color: var(--crema); transform: scale(1.06); }
+
+.casilla-duelo.volteada { animation: voltear 0.45s ease both; }
+
+@keyframes voltear {
+  0% { transform: rotateX(0); }
+  50% { transform: rotateX(90deg) scale(1.1); }
+  100% { transform: rotateX(0); }
+}
+
+.casilla-duelo.correcta { color: #08301f; background: var(--verde); border-color: var(--verde); }
+.casilla-duelo.posicion { color: #3a2b00; background: var(--amarillo); border-color: var(--amarillo); }
+.casilla-duelo.incorrecta { color: var(--pizarra); background: rgba(0, 0, 0, 0.5); border-color: rgba(255, 255, 255, 0.08); }
+
+.mensaje-duelo {
+  min-height: 1.5em;
+  font-size: 16px;
+  text-align: center;
+  color: var(--crema-2);
+}
+
+.mensaje-duelo.error { color: var(--rojo); }
+.mensaje-duelo.aparece { animation: rebote 0.34s cubic-bezier(0.2, 1.7, 0.4, 1); }
+
+/* ---------- Teclado virtual ---------- */
+.teclado-duelo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  margin-top: auto;
+}
+
+.fila-teclado { display: flex; justify-content: center; gap: 5px; }
+
+.tecla {
+  flex: 1 1 auto;
+  max-width: 48px;
+  padding: 0.7em 0;
+  border: 2px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--crema);
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.4);
+  transition: transform 0.08s, background 0.2s;
+}
+
+.tecla:hover { background: rgba(255, 255, 255, 0.2); }
+.tecla:active { transform: translateY(3px); box-shadow: none; }
+.tecla.ancha { flex: 1.8 1 auto; max-width: 92px; font-size: 12px; letter-spacing: 0.06em; }
+
+.tecla.correcta { color: #08301f; background: var(--verde); border-color: var(--verde); }
+.tecla.posicion { color: #3a2b00; background: var(--amarillo); border-color: var(--amarillo); }
+.tecla.incorrecta { color: #55707f; background: rgba(0, 0, 0, 0.5); }

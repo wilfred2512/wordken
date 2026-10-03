@@ -1,0 +1,135 @@
+/* =============================================================================
+   La mano del jugador y la tira de historial.
+   Separado de partida.css para que ningún archivo pase de 300 líneas.
+   ========================================================================== */
+
+/* ---------- Mano ---------- */
+.mano {
+  display: flex;
+  justify-content: center;
+  gap: clamp(8px, 1.6vw, 20px);
+  padding-top: 12px;
+  perspective: 900px;
+}
+
+/* Igual que las cartas de la arena: el tamaño lo manda la ALTURA disponible.
+   Con `13vw` una pantalla ancha y baja daba cartas gigantes que no cabían. */
+.carta {
+  position: relative;
+  height: clamp(104px, 23vh, 196px);
+  width: auto;
+  aspect-ratio: 5 / 7;
+  border: 5px solid var(--tinta);
+  border-radius: 16px;
+  color: var(--tinta);
+  background: var(--papel);
+  box-shadow: var(--sombra);
+  transform-style: preserve-3d;
+  transition: transform 0.16s cubic-bezier(0.2, 1.5, 0.4, 1), box-shadow 0.16s, filter 0.16s;
+  animation: reposo-carta 4s ease-in-out infinite;
+}
+
+.carta:nth-child(2) { animation-delay: 0.5s; }
+.carta:nth-child(3) { animation-delay: 1s; }
+.carta:nth-child(4) { animation-delay: 1.5s; }
+
+@keyframes reposo-carta {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  25% { transform: translateY(-9px) rotate(0.5deg); }
+  50% { transform: translateY(-14px) rotate(2deg); }
+  75% { transform: translateY(-5px) rotate(-0.5deg); }
+}
+
+.carta:hover:not(:disabled) {
+  z-index: 3;
+  animation: none;
+  transform: translateY(-22px) scale(1.07) rotate(0deg);
+  box-shadow: 0 18px 0 rgba(0, 0, 0, 0.3), 0 26px 40px rgba(0, 0, 0, 0.5);
+}
+
+.carta:disabled { filter: saturate(0.4) brightness(0.75); cursor: not-allowed; animation: none; }
+.carta.elegida { filter: none !important; animation: carta-elegida 0.5s cubic-bezier(0.2, 1.6, 0.4, 1); }
+
+@keyframes carta-elegida {
+  0% { transform: translateY(-22px) scale(1.07); }
+  45% { transform: translateY(-46px) scale(1.16) rotate(-4deg); }
+  100% { transform: translateY(-10px) scale(1); }
+}
+
+.carta-interior {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 8px;
+  border-radius: 11px;
+  background: linear-gradient(180deg, #fffdf6, #efe4cb);
+}
+
+.carta-titulo { font-family: var(--fuente-titular); font-size: clamp(7px, 1vw, 10px); color: var(--tinta); }
+.carta-icono { width: 60%; height: 50%; transition: transform 0.18s cubic-bezier(0.2, 1.6, 0.4, 1); }
+.carta-pie { font-size: 11px; line-height: 1.25; text-align: center; color: #5c6b78; }
+
+.carta:hover:not(:disabled) .carta-icono { transform: scale(1.14) rotate(-4deg); }
+
+/* ---------- Anillo de luz del color de la tirada ----------
+   `currentColor` es el color que le da .m-piedra / .m-papel / .m-tijera, así
+   que cada carta se ilumina de su propio color sin una regla por carta. */
+.carta::after {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  border-radius: 16px;
+  pointer-events: none;
+  box-shadow: 0 0 0 0 currentColor;
+  transition: box-shadow 0.2s;
+}
+
+.carta:hover:not(:disabled)::after {
+  box-shadow: 0 0 0 4px currentColor, 0 0 30px currentColor;
+}
+
+/* ---------- Barrido de brillo al pasar por encima ---------- */
+.carta-interior::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 11px;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(115deg, transparent 35%, rgba(255, 255, 255, 0.85) 50%, transparent 65%);
+  background-size: 260% 100%;
+  background-position: 120% 0;
+}
+
+.carta:hover:not(:disabled) .carta-interior::after { animation: barrido 0.7s ease-out; }
+
+@keyframes barrido {
+  0% { opacity: 0.9; background-position: 120% 0; }
+  100% { opacity: 0; background-position: -60% 0; }
+}
+
+/* La carta elegida se marca con su propio color mientras se resuelve. */
+.carta.elegida::after { box-shadow: 0 0 0 5px currentColor, 0 0 40px currentColor; }
+
+/* ---------- Historial ---------- */
+.tira-historial { display: flex; align-items: center; gap: 10px; padding: 4px 2px 0; }
+.tira-etiqueta { font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--pizarra); }
+.historial { flex: 1; display: flex; gap: 5px; overflow: hidden; }
+
+.marca-historial {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 2px solid rgba(0, 0, 0, 0.4);
+  border-radius: 7px;
+  animation: brincar 0.3s cubic-bezier(0.2, 1.6, 0.4, 1) both;
+}
+
+.marca-historial svg { width: 14px; height: 14px; }
+.marca-historial.ganada { color: #08301f; background: rgba(53, 189, 134, 0.9); }
+.marca-historial.perdida { color: #3a100c; background: rgba(254, 95, 85, 0.9); }
+.marca-historial.empatada { color: #17242e; background: rgba(124, 152, 173, 0.6); }

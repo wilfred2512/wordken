@@ -1,0 +1,260 @@
+/* =============================================================================
+   FRENESÍ: que desde el menú ya parezca una máquina tragamonedas encendida.
+
+   Quinto y último archivo de animación. Lo que va aquí se pidió así: "bastante
+   movido y frenético incluso desde el menú", en todos los menús y botones.
+   Las reglas de siempre siguen valiendo (docs/relevo.md, 13 a 15):
+
+     · solo se anima lo que resuelve la tarjeta gráfica: translate, rotate,
+       scale, opacity y filter
+     · para mover algo que ya tiene `transform` se usan translate / rotate /
+       scale sueltos, que se componen con él en vez de pisarlo
+     · si un elemento ya tenía una animación en otra hoja, aquí se declaran
+       LAS DOS separadas por coma; si no, la de la otra hoja desaparecería
+     · lo que se pulsa se queda quieto al pasarle el cursor por encima
+   ========================================================================== */
+
+/* =============================================================================
+   1 · FONDO VIVO: piezas que suben flotando detrás de todo
+   render/fondo-vivo.js crea las piezas con su recorrido en variables.
+   ========================================================================== */
+#fondo-vivo {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+}
+
+.pieza-fondo {
+  position: absolute;
+  top: 0;
+  left: var(--x0);
+  width: var(--tam);
+  height: var(--tam);
+  opacity: var(--alfa);
+  animation: pieza-sube var(--dur) linear var(--ret) infinite;
+}
+
+.pieza-fondo svg { width: 100%; height: 100%; }
+.pieza-fondo.m-piedra { color: var(--azul); }
+.pieza-fondo.m-papel { color: var(--amarillo); }
+.pieza-fondo.m-tijera { color: var(--rojo); }
+
+@keyframes pieza-sube {
+  from { translate: 0 110vh; rotate: 0deg; }
+  to { translate: var(--x1) -20vh; rotate: var(--giro); }
+}
+
+/* En la partida el fondo se aparta: ahí lo que importa son las cartas. */
+body:has(#pantalla-partida.es-activa) #fondo-vivo,
+body:has(#pantalla-duelo.es-activa) #fondo-vivo { opacity: 0.4; }
+
+/* =============================================================================
+   2 · MENÚ
+   ========================================================================== */
+
+/* El título cambia de color sin parar y cada pocos segundos pega un sacudón.
+   Las letras, además, saltan en ola (vida-propia.css). */
+.logotipo-titulo { animation: titulo-arcoiris 8s linear infinite, titulo-sacudon 4.5s ease-in-out infinite; }
+
+@keyframes titulo-arcoiris {
+  to { filter: hue-rotate(360deg); }
+}
+
+@keyframes titulo-sacudon {
+  0%, 84%, 100% { rotate: 0deg; scale: 1; }
+  87% { rotate: -3deg; scale: 1.1; }
+  90% { rotate: 3deg; scale: 1.06; }
+  93% { rotate: -1.5deg; scale: 1.03; }
+  96% { rotate: 0.5deg; scale: 1; }
+}
+
+/* JUGAR late como un corazón; los otros dos se menean por turnos.
+   Se repite `entra-abajo` porque la entrada escalonada vive en vida-propia.css
+   y un elemento solo tiene una propiedad `animation`. */
+.botones-menu .boton {
+  animation:
+    entra-abajo 0.55s cubic-bezier(0.2, 1.5, 0.4, 1) both,
+    boton-meneo 3s ease-in-out 1s infinite;
+}
+
+.botones-menu .boton:nth-child(3) { animation-delay: 0.16s, 2.4s; }
+
+#boton-jugar {
+  animation:
+    entra-abajo 0.55s cubic-bezier(0.2, 1.5, 0.4, 1) both,
+    latido-jugar 1.2s ease-in-out 0.7s infinite;
+}
+
+/* Con el cursor encima se quedan quietos: un botón que se mueve mientras lo
+   apuntas es un blanco móvil. Se quita solo la animación infinita. */
+.botones-menu .boton:hover,
+#boton-jugar:hover { animation-name: entra-abajo, none; }
+
+@keyframes latido-jugar {
+  0%, 100% { scale: 1; }
+  14% { scale: 1.09; }
+  28% { scale: 1; }
+  42% { scale: 1.06; }
+  70% { scale: 1; }
+}
+
+@keyframes boton-meneo {
+  0%, 68%, 100% { rotate: 0deg; scale: 1; }
+  74% { rotate: -4deg; scale: 1.06; }
+  80% { rotate: 4deg; }
+  86% { rotate: -2.5deg; }
+  92% { rotate: 1deg; scale: 1; }
+}
+
+/* =============================================================================
+   3 · CUALQUIER BOTÓN: un meneo de vez en cuando
+   `:where()` deja la especificidad en la de `.boton` a secas, para que las
+   animaciones propias de cada botón (el duelo listo, los del menú) sigan
+   mandando sobre esta.
+   ========================================================================== */
+.boton:where(:not(:disabled)) { animation: boton-vivo 3.6s ease-in-out infinite; }
+.boton:where(:not(:disabled)):hover { animation: none; }
+.pie-modal .boton:last-child { animation-delay: 1.4s; }
+
+@keyframes boton-vivo {
+  0%, 72%, 100% { rotate: 0deg; scale: 1; }
+  78% { rotate: -2.5deg; scale: 1.05; }
+  84% { rotate: 2.5deg; }
+  90% { rotate: -1deg; scale: 1; }
+}
+
+/* =============================================================================
+   4 · CONFIGURACIÓN
+   ========================================================================== */
+
+/* Los atajos de vida hacen la ola, de izquierda a derecha. */
+.atajo-vida { animation: atajo-ola 2.8s ease-in-out infinite; }
+.atajo-vida:nth-child(2) { animation-delay: 0.1s; }
+.atajo-vida:nth-child(3) { animation-delay: 0.2s; }
+.atajo-vida:nth-child(4) { animation-delay: 0.3s; }
+.atajo-vida:nth-child(5) { animation-delay: 0.4s; }
+.atajo-vida:hover { animation: none; }
+
+@keyframes atajo-ola {
+  0%, 55%, 100% { translate: 0 0; scale: 1; }
+  65% { translate: 0 -7px; scale: 1.08; }
+  75% { translate: 0 1px; scale: 0.97; }
+  85% { translate: 0 0; scale: 1; }
+}
+
+/* Las dificultades no elegidas se balancean pidiendo que las elijan; la
+   elegida late. Se repite `brinco-opcion`, que es el salto al elegirla. */
+.selector .opcion:not(.activa) { animation: opcion-espera 3.2s ease-in-out infinite; }
+.selector .opcion:not(.activa):nth-child(2) { animation-delay: 0.4s; }
+.selector .opcion:not(.activa):nth-child(3) { animation-delay: 0.8s; }
+.selector .opcion:not(.activa):nth-child(4) { animation-delay: 1.2s; }
+.selector .opcion:hover { animation: none; }
+
+.selector .opcion.activa {
+  animation:
+    brinco-opcion 0.35s cubic-bezier(0.2, 1.7, 0.4, 1),
+    opcion-elegida 1.3s ease-in-out 0.35s infinite;
+}
+
+@keyframes opcion-espera {
+  0%, 70%, 100% { rotate: 0deg; }
+  78% { rotate: -3deg; }
+  86% { rotate: 3deg; }
+  93% { rotate: -1deg; }
+}
+
+@keyframes opcion-elegida {
+  0%, 100% { scale: 1; }
+  50% { scale: 1.06; }
+}
+
+/* La carita del rival en la ficha no para quieta. */
+.ficha-personaje .cara-mini { animation: cara-mini-brinca 1.1s ease-in-out infinite; }
+
+@keyframes cara-mini-brinca {
+  0%, 100% { translate: 0 0; rotate: -8deg; }
+  50% { translate: 0 -5px; rotate: 8deg; }
+}
+
+/* =============================================================================
+   5 · PARTIDA
+   ========================================================================== */
+.boton-sonido { animation: sonido-baila 2.2s ease-in-out infinite; }
+.boton-sonido.silenciado,
+.boton-sonido:hover { animation: none; }
+
+@keyframes sonido-baila {
+  0%, 100% { rotate: 0deg; scale: 1; }
+  25% { rotate: -14deg; scale: 1.08; }
+  75% { rotate: 14deg; scale: 1.08; }
+}
+
+.ficha-ronda { animation: ronda-late 1.8s ease-in-out infinite; }
+
+@keyframes ronda-late {
+  0%, 100% { scale: 1; }
+  50% { scale: 1.1; }
+}
+
+.insignia-cadena:not(.nivel3) { animation: insignia-bota 2.4s ease-in-out infinite; }
+
+@keyframes insignia-bota {
+  0%, 100% { translate: 0 0; rotate: 0deg; }
+  30% { translate: 0 -3px; rotate: -2deg; }
+  60% { translate: 0 0; rotate: 2deg; }
+}
+
+/* La última marca del historial parpadea: es la ronda que acaba de pasar. */
+.marca-historial:last-child {
+  animation:
+    brincar 0.3s cubic-bezier(0.2, 1.6, 0.4, 1) both,
+    ultima-marca 1s ease-in-out 0.3s infinite;
+}
+
+@keyframes ultima-marca {
+  0%, 100% { scale: 1; }
+  50% { scale: 1.25; }
+}
+
+/* =============================================================================
+   6 · DUELO: cada tres segundos pasa una ola por el teclado
+   Se repite `entra-tecla` (vida-propia.css) y cada tecla lleva dos retardos:
+   el de su entrada en cascada y el de su paso de la ola.
+   ========================================================================== */
+.fila-teclado .tecla {
+  animation:
+    entra-tecla 0.3s ease-out both,
+    tecla-ola 3s ease-in-out 1s infinite;
+}
+
+.fila-teclado .tecla:nth-child(2) { animation-delay: 0.02s, 1.06s; }
+.fila-teclado .tecla:nth-child(3) { animation-delay: 0.04s, 1.12s; }
+.fila-teclado .tecla:nth-child(4) { animation-delay: 0.06s, 1.18s; }
+.fila-teclado .tecla:nth-child(5) { animation-delay: 0.08s, 1.24s; }
+.fila-teclado .tecla:nth-child(6) { animation-delay: 0.1s, 1.3s; }
+.fila-teclado .tecla:nth-child(7) { animation-delay: 0.12s, 1.36s; }
+.fila-teclado .tecla:nth-child(8) { animation-delay: 0.14s, 1.42s; }
+.fila-teclado .tecla:nth-child(9) { animation-delay: 0.16s, 1.48s; }
+.fila-teclado .tecla:nth-child(10) { animation-delay: 0.18s, 1.54s; }
+
+@keyframes tecla-ola {
+  0%, 20%, 100% { translate: 0 0; scale: 1; }
+  8% { translate: 0 -5px; scale: 1.06; }
+}
+
+/* =============================================================================
+   7 · MENOS MOVIMIENTO
+   Con "reducir movimiento" activado en el sistema se para lo que se mueve
+   solo por decorar. Lo que informa (golpes, impactos, fanfarrias) se queda.
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .pieza-fondo,
+  .logotipo-titulo,
+  .boton-sonido,
+  .ficha-ronda,
+  .insignia-cadena,
+  .ficha-personaje .cara-mini { animation: none; }
+}

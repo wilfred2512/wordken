@@ -1,0 +1,243 @@
+/* =============================================================================
+   El ayudante: botón flotante y panel de chat.
+
+   Va por encima de todo (`position: fixed`) porque acompaña al jugador en
+   las tres pantallas: menú, partida y duelo. El botón se coloca debajo del de
+   sonido, en la misma columna, para que las dos cosas que siempre están ahí
+   estén juntas y no repartidas por las esquinas.
+   ========================================================================== */
+
+#chat-ayuda {
+  position: fixed;
+  top: 76px;
+  right: 14px;
+  z-index: 70;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+/* ---------- El botón redondo ---------- */
+.chat-abrir {
+  width: 44px;
+  height: 44px;
+  border: 3px solid var(--tinta);
+  border-radius: 50%;
+  font-family: var(--fuente-titular);
+  font-size: 16px;
+  color: var(--tinta);
+  cursor: pointer;
+  background: var(--amarillo);
+  box-shadow: 0 5px 0 rgba(0, 0, 0, 0.35);
+  transition: transform 0.16s cubic-bezier(0.2, 1.6, 0.4, 1), box-shadow 0.16s;
+  animation: chat-llama 3.8s ease-in-out infinite;
+}
+
+.chat-abrir:hover { transform: translateY(-3px) scale(1.1) rotate(-6deg); box-shadow: 0 8px 0 rgba(0, 0, 0, 0.35); }
+.chat-abrir:active { transform: translateY(2px) scale(0.94); box-shadow: 0 2px 0 rgba(0, 0, 0, 0.35); }
+
+/* Un guiño cada pocos segundos para que se vea que está ahí. */
+@keyframes chat-llama {
+  0%, 88%, 100% { transform: rotate(0deg); }
+  91% { transform: rotate(-12deg) scale(1.08); }
+  95% { transform: rotate(12deg) scale(1.08); }
+}
+
+#chat-ayuda.abierto .chat-abrir { animation: none; background: var(--naranja); }
+
+/* ---------- El panel ---------- */
+.chat-panel {
+  display: flex;
+  flex-direction: column;
+  width: min(84vw, 320px);
+  max-height: min(64vh, 440px);
+  border: 4px solid var(--tinta);
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--fondo-1);
+  box-shadow: 0 12px 0 rgba(0, 0, 0, 0.3), 0 20px 40px rgba(0, 0, 0, 0.5);
+  animation: chat-entra 0.32s cubic-bezier(0.2, 1.6, 0.4, 1) both;
+}
+
+@keyframes chat-entra {
+  0% { opacity: 0; transform: scale(0.7) translate(30px, -30px); }
+  100% { opacity: 1; transform: scale(1) translate(0, 0); }
+}
+
+.chat-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.55em 0.75em;
+  background: var(--tinta);
+}
+
+.chat-cabecera b { font-family: var(--fuente-titular); font-size: 11px; letter-spacing: 0.1em; color: var(--amarillo); }
+
+/* Con qué cerebro se habla: verde con modelo, gris con la tabla de repuesto. */
+.chat-estado {
+  margin-left: 0.6em;
+  margin-right: auto;
+  padding: 0.1em 0.5em;
+  border-radius: 999px;
+  font-size: 11px;
+  color: var(--crema-2);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+#chat-ayuda.con-modelo .chat-estado { color: var(--tinta); background: var(--verde); }
+
+/* El motivo de una respuesta de repuesto: pequeño y apagado, pero legible. */
+.chat-burbuja.chat-nota {
+  align-self: flex-start;
+  max-width: 92%;
+  padding: 0.2em 0.5em;
+  font-size: 11px;
+  font-style: italic;
+  color: var(--naranja);
+  background: transparent;
+}
+
+.chat-cerrar {
+  border: 0;
+  font-size: 15px;
+  line-height: 1;
+  color: var(--crema-2);
+  cursor: pointer;
+  background: none;
+  transition: transform 0.15s, color 0.15s;
+}
+
+.chat-cerrar:hover { transform: scale(1.3) rotate(90deg); color: var(--rojo); }
+
+/* ---------- Los mensajes ---------- */
+.chat-mensajes {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
+}
+
+.chat-burbuja {
+  max-width: 86%;
+  padding: 0.5em 0.7em;
+  border-radius: 12px;
+  font-size: 13px;
+  line-height: 1.4;
+  animation: chat-burbuja 0.3s cubic-bezier(0.2, 1.6, 0.4, 1) both;
+}
+
+.chat-burbuja.del-ayudante {
+  align-self: flex-start;
+  border-bottom-left-radius: 4px;
+  color: var(--tinta);
+  background: var(--papel);
+}
+
+.chat-burbuja.del-jugador {
+  align-self: flex-end;
+  border-bottom-right-radius: 4px;
+  color: #04202f;
+  background: var(--azul);
+}
+
+@keyframes chat-burbuja {
+  0% { opacity: 0; transform: translateY(10px) scale(0.9); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Los tres puntitos de "estoy escribiendo". */
+#chat-ayuda.pensando .chat-mensajes::after {
+  content: "· · ·";
+  align-self: flex-start;
+  padding: 0.3em 0.7em;
+  border-radius: 12px;
+  font-size: 15px;
+  letter-spacing: 0.1em;
+  color: var(--tinta);
+  background: var(--papel);
+  animation: chat-puntos 1s steps(1) infinite;
+}
+
+@keyframes chat-puntos {
+  0% { opacity: 0.35; }
+  50% { opacity: 1; }
+}
+
+/* ---------- Preguntas rápidas ---------- */
+.chat-sugerencias {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  padding: 0 10px 8px;
+}
+
+.chat-sugerencia {
+  padding: 0.3em 0.6em;
+  border: 2px solid rgba(255, 255, 255, 0.16);
+  border-radius: 20px;
+  font-family: var(--fuente-interfaz);
+  font-size: 11px;
+  color: var(--crema-2);
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.07);
+  transition: transform 0.14s, background 0.14s;
+}
+
+.chat-sugerencia:hover { transform: translateY(-2px); background: rgba(255, 255, 255, 0.18); }
+.chat-sugerencia:active { transform: translateY(1px) scale(0.96); }
+
+/* ---------- La caja de escribir ---------- */
+.chat-pie {
+  display: flex;
+  gap: 6px;
+  padding: 8px 10px 10px;
+  border-top: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Se apunta con `.chat-pie .chat-campo` y no con `.chat-campo` a secas porque
+   modales.css estiliza `input[type="text"]`, que gana en especificidad: los
+   campos del formulario de partida son grandes y de papel, y este no. */
+.chat-pie .chat-campo {
+  flex: 1;
+  min-width: 0;
+  padding: 0.5em 0.7em;
+  border: 2px solid rgba(255, 255, 255, 0.16);
+  border-radius: 10px;
+  font-family: var(--fuente-interfaz);
+  font-size: 13px;
+  color: var(--crema);
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.chat-pie .chat-campo:focus {
+  outline: none;
+  border-color: var(--amarillo);
+  box-shadow: 0 0 0 3px rgba(255, 210, 63, 0.28);
+}
+
+.chat-enviar {
+  flex: none;
+  width: 36px;
+  border: 2px solid var(--tinta);
+  border-radius: 10px;
+  font-size: 14px;
+  color: var(--tinta);
+  cursor: pointer;
+  background: var(--amarillo);
+  transition: transform 0.14s;
+}
+
+.chat-enviar:hover { transform: scale(1.1); }
+.chat-enviar:active { transform: scale(0.9); }
+
+/* En pantallas pequeñas el panel ocupa casi todo el ancho, pero el botón se
+   queda ARRIBA: abajo a la derecha está el de pausa y se pisaban. */
+@media (max-width: 640px) {
+  #chat-ayuda { top: 66px; right: 10px; }
+  .chat-abrir { width: 38px; height: 38px; font-size: 14px; }
+  .chat-panel { width: calc(100vw - 20px); max-height: 58vh; }
+}

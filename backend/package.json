@@ -1,0 +1,21 @@
+{
+  "name": "backend-mini-proyecto-ra1",
+  "version": "1.0.0",
+  "description": "Servicio de apoyo del juego: jugadores, partidas y tabla de puntuaciones",
+  "main": "server.js",
+  "type": "module",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "start": "node --disable-warning=ExperimentalWarning server.js",
+    "dev": "node --disable-warning=ExperimentalWarning --watch server.js",
+    "semilla": "node --disable-warning=ExperimentalWarning src/config/sembrar-datos.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2"
+  },
+  "license": "MIT"
+}

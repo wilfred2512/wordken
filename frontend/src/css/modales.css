@@ -1,0 +1,267 @@
+/* =============================================================================
+   Ventanas modales: configuración, reglas, aviso, pausa, premio y final.
+   ========================================================================== */
+
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  overflow: auto;
+  background: rgba(6, 12, 18, 0.72);
+  backdrop-filter: blur(3px);
+  animation: aparecer 0.18s ease both;
+}
+
+@keyframes aparecer { from { opacity: 0; } }
+@keyframes desaparecer { to { opacity: 0; } }
+
+.modal.cerrando { animation: desaparecer 0.16s ease both; }
+
+.tarjeta-modal {
+  width: min(560px, 100%);
+  border: 5px solid var(--tinta);
+  border-radius: 20px;
+  background: linear-gradient(180deg, #2c4356, #213645);
+  box-shadow: var(--sombra);
+  animation: brincar 0.34s cubic-bezier(0.2, 1.6, 0.4, 1) both;
+}
+
+@keyframes brincar {
+  from { opacity: 0; transform: scale(0.82) translateY(24px) rotate(-1.5deg); }
+}
+
+.cabecera-modal {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 4px solid rgba(0, 0, 0, 0.3);
+  border-radius: 15px 15px 0 0;
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.cabecera-modal h2 {
+  font-family: var(--fuente-titular);
+  font-size: 15px;
+  letter-spacing: 0.06em;
+  color: var(--amarillo);
+  text-shadow: 0 3px 0 rgba(0, 0, 0, 0.4);
+}
+
+.cerrar {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  font-size: 16px;
+  color: var(--crema);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.cerrar:hover { background: var(--rojo); }
+
+.cuerpo-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 20px;
+}
+
+/* `flex-wrap` no es decorativo: con la tipografía pixel cargada los botones
+   son más anchos que sin ella, y sin envolver se salían de la tarjeta. */
+.pie-modal {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 20px;
+  border-top: 4px solid rgba(0, 0, 0, 0.3);
+  border-radius: 0 0 15px 15px;
+  background: rgba(0, 0, 0, 0.14);
+}
+
+.pie-modal.centrado { justify-content: center; }
+.pie-modal .boton { flex: 0 1 auto; max-width: 100%; }
+
+/* ---------- Campos del formulario ---------- */
+.campo { display: flex; flex-direction: column; gap: 9px; }
+.campo-cabecera { display: flex; align-items: baseline; justify-content: space-between; }
+
+.campo label {
+  font-size: 15px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--crema-2);
+}
+
+.apunte { font-size: 13px; letter-spacing: 0.08em; color: var(--pizarra); }
+
+input[type="text"],
+input[type="number"] {
+  width: 100%;
+  padding: 0.55em 0.7em;
+  border: 4px solid var(--tinta);
+  border-radius: 11px;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--tinta);
+  background: var(--papel);
+  box-shadow: inset 0 -4px 0 rgba(0, 0, 0, 0.12);
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--azul);
+  box-shadow: inset 0 -4px 0 rgba(0, 0, 0, 0.12), 0 0 0 4px rgba(0, 157, 255, 0.28);
+}
+
+input[type="number"] { -moz-appearance: textfield; }
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+@keyframes temblor-campo {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-8px); }
+  40% { transform: translateX(7px); }
+  60% { transform: translateX(-5px); }
+  80% { transform: translateX(4px); }
+}
+
+input.mal { animation: temblor-campo 0.34s ease; border-color: var(--rojo); background: #ffe9e7; }
+
+.fila-vida { display: flex; gap: 10px; align-items: stretch; }
+.fila-vida-doble { display: flex; gap: 10px; align-items: flex-end; animation: brincar 0.3s cubic-bezier(0.2, 1.6, 0.4, 1) both; }
+.columna-vida { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+.columna-vida label { font-size: 13px; }
+
+.resumen {
+  padding: 0.6em;
+  border-radius: 10px;
+  font-size: 15px;
+  text-align: center;
+  letter-spacing: 0.04em;
+  color: var(--pizarra);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.resumen b { color: var(--amarillo); }
+
+/* ---------- Reglas ---------- */
+.reglas { gap: 12px; }
+
+.regla {
+  padding: 0.7em 0.85em;
+  border-left: 6px solid var(--pizarra);
+  border-radius: 11px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--crema-2);
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.regla b { color: var(--papel); }
+
+.clave {
+  display: block;
+  margin-bottom: 3px;
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  color: var(--pizarra) !important;
+}
+
+.clave.azul { color: var(--azul) !important; }
+.clave.naranja { color: var(--naranja) !important; }
+.clave.morada { color: var(--morado) !important; }
+.clave.verde { color: var(--verde) !important; }
+.clave.amarilla { color: var(--amarillo) !important; }
+.clave.roja { color: var(--rojo) !important; }
+
+/* ---------- Aviso animado ---------- */
+.tarjeta-aviso {
+  width: min(430px, 100%);
+  padding: 26px 24px 24px;
+  text-align: center;
+  border-color: var(--rojo);
+  background: linear-gradient(180deg, #5a2b28, #3a1e1c);
+}
+
+.tarjeta-aviso.rebota { animation: entrada-aviso 0.55s cubic-bezier(0.2, 1.5, 0.4, 1) both; }
+
+@keyframes entrada-aviso {
+  0% { opacity: 0; transform: scale(0.4) rotate(-9deg); }
+  55% { opacity: 1; transform: scale(1.08) rotate(3deg); }
+  70% { transform: scale(0.97) rotate(-2deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+
+.aviso-signo {
+  margin-bottom: 10px;
+  font-family: var(--fuente-titular);
+  font-size: 44px;
+  color: var(--amarillo);
+  text-shadow: 0 5px 0 rgba(0, 0, 0, 0.5);
+  animation: bamboleo 0.8s ease-in-out infinite;
+}
+
+@keyframes bamboleo {
+  0%, 100% { transform: rotate(-8deg) scale(1); }
+  50% { transform: rotate(8deg) scale(1.14); }
+}
+
+.tarjeta-aviso h2 { margin-bottom: 12px; font-family: var(--fuente-titular); font-size: 16px; line-height: 1.5; color: var(--rojo); }
+.tarjeta-aviso p { margin-bottom: 20px; font-size: 17px; line-height: 1.5; color: var(--crema-2); }
+.tarjeta-aviso p b { color: var(--amarillo); }
+
+/* ---------- Pausa y final ---------- */
+.tarjeta-pausa { width: min(460px, 100%); }
+
+.aviso-pausa {
+  padding: 18px 20px 4px;
+  font-size: 15px;
+  text-align: center;
+  color: var(--crema-2);
+}
+
+.aviso-pausa b { color: var(--amarillo); }
+
+.tarjeta-fin { width: min(500px, 100%); padding: 0 24px 20px; overflow: hidden; text-align: center; }
+
+.cinta-fin {
+  margin: 0 -24px 18px;
+  padding: 0.7em;
+  border-bottom: 5px solid rgba(0, 0, 0, 0.3);
+  font-family: var(--fuente-titular);
+  font-size: 15px;
+  letter-spacing: 0.1em;
+  color: #fff;
+  background: var(--verde);
+  text-shadow: 0 3px 0 rgba(0, 0, 0, 0.35);
+}
+
+.tarjeta-fin.derrota .cinta-fin { background: var(--rojo); }
+.tarjeta-fin.maxima .cinta-fin { background: var(--morado); }
+
+.tarjeta-fin h2 {
+  margin-bottom: 12px;
+  font-family: var(--fuente-titular);
+  font-size: 20px;
+  color: var(--crema);
+  text-shadow: 0 4px 0 rgba(0, 0, 0, 0.4);
+}
+
+.tarjeta-fin #subtitulo-fin { margin-bottom: 16px; font-size: 17px; color: var(--crema-2); }
+
+.estadisticas-fin {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(104px, 1fr));
+  gap: 10px;
+}
+
+.dato-final { padding: 0.6em; border-radius: 11px; background: rgba(0, 0, 0, 0.24); }
+.dato-final b { display: block; margin-bottom: 4px; font-family: var(--fuente-titular); font-size: 16px; color: var(--amarillo); }
+.dato-final span { font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--pizarra); }
+
+.estado-guardado { margin-top: 12px; font-size: 14px; letter-spacing: 0.08em; color: var(--pizarra); }
+.tarjeta-fin .pie-modal { margin-top: 8px; border: 0; background: none; }

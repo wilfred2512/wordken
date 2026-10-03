@@ -1,0 +1,148 @@
+/* =============================================================================
+   Botones. El relieve se consigue con una sombra sólida abajo que se acorta
+   al pulsar: parece que el botón se hunde de verdad.
+   ========================================================================== */
+
+.boton {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  padding: 0.62em 1.5em;
+  border: 3px solid rgba(0, 0, 0, 0.22);
+  border-radius: 11px;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.3);
+  color: #fff;
+  background: var(--pizarra);
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.35), 0 10px 16px rgba(0, 0, 0, 0.35);
+  transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.15s ease;
+}
+
+.boton:hover:not(:disabled) {
+  filter: brightness(1.1);
+  transform: translateY(-2px);
+}
+
+.boton:active:not(:disabled) {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.35);
+}
+
+.boton:disabled {
+  filter: saturate(0.35) brightness(0.7);
+  cursor: not-allowed;
+}
+
+.boton-grande { padding: 0.6em 1.9em; font-size: 26px; }
+.boton-diminuto { padding: 0.35em 0.9em; border-radius: 8px; font-size: 14px; }
+
+.boton-rojo { background: var(--rojo); box-shadow: 0 6px 0 var(--rojo-oscuro), 0 12px 20px rgba(0, 0, 0, 0.4); }
+.boton-rojo:active:not(:disabled) { box-shadow: 0 2px 0 var(--rojo-oscuro); }
+
+.boton-azul { background: var(--azul); box-shadow: 0 6px 0 var(--azul-oscuro), 0 12px 20px rgba(0, 0, 0, 0.4); }
+.boton-azul:active:not(:disabled) { box-shadow: 0 2px 0 var(--azul-oscuro); }
+
+.boton-naranja { background: var(--naranja); box-shadow: 0 6px 0 var(--naranja-oscuro), 0 12px 20px rgba(0, 0, 0, 0.4); }
+.boton-naranja:active:not(:disabled) { box-shadow: 0 2px 0 var(--naranja-oscuro); }
+
+.boton-fantasma {
+  color: var(--crema);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow: 0 5px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* ---------- Botón de sonido ---------- */
+.boton-sonido {
+  position: fixed;
+  z-index: 60;
+  top: 14px;
+  right: 16px;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 2px solid rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--crema);
+  background: rgba(0, 0, 0, 0.35);
+  transition: transform 0.12s ease, background 0.2s;
+}
+
+.boton-sonido:hover { transform: scale(1.08); background: rgba(0, 0, 0, 0.5); }
+.boton-sonido.silenciado { color: var(--rojo); }
+
+.boton-sonido.silenciado::after {
+  content: "";
+  position: absolute;
+  width: 30px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--rojo);
+  transform: rotate(-45deg);
+}
+
+/* ---------- Botón de separar vidas ---------- */
+.boton-separar {
+  flex: 0 0 58px;
+  border: 4px solid var(--tinta);
+  border-radius: 11px;
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1;
+  color: #fff;
+  background: var(--verde);
+  box-shadow: 0 5px 0 var(--verde-oscuro);
+  transition: transform 0.1s, box-shadow 0.1s, background 0.2s;
+}
+
+.boton-separar:hover { filter: brightness(1.1); }
+.boton-separar:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--verde-oscuro); }
+.boton-separar.abierto { height: 58px; font-size: 26px; background: var(--naranja); box-shadow: 0 5px 0 var(--naranja-oscuro); }
+
+/* ---------- Atajos de vida y selector de dificultad ---------- */
+.atajos { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.atajo-vida {
+  padding: 0.34em 0.85em;
+  border: 3px solid rgba(255, 255, 255, 0.14);
+  border-radius: 9px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--crema);
+  background: rgba(255, 255, 255, 0.09);
+  transition: 0.15s;
+}
+
+.atajo-vida:hover { transform: translateY(-2px); background: var(--azul); border-color: var(--tinta); }
+
+.selector { display: flex; gap: 8px; }
+
+.selector .opcion {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 0.6em 0.4em;
+  border: 3px solid rgba(255, 255, 255, 0.13);
+  border-radius: 11px;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--crema-2);
+  background: rgba(255, 255, 255, 0.07);
+  transition: 0.16s;
+}
+
+.selector .opcion small { font-size: 12px; font-weight: 400; letter-spacing: 0; text-transform: none; opacity: 0.7; }
+.selector .opcion:hover { transform: translateY(-2px); background: rgba(255, 255, 255, 0.13); }
+.selector .opcion.activa { color: #fff; background: var(--azul); border-color: var(--tinta); box-shadow: 0 5px 0 var(--azul-oscuro); }

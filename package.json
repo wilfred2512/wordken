@@ -1,0 +1,19 @@
+{
+  "name": "mini-proyecto-ra1",
+  "version": "1.0.0",
+  "description": "Piedra, papel o tijera con cadenas, poderes y duelos de palabras",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "start": "node herramientas/arrancar-todo.mjs",
+    "jugar": "node herramientas/arrancar-todo.mjs",
+    "frontend": "node herramientas/servidor-estatico.mjs",
+    "backend": "npm start --prefix backend",
+    "instalar": "npm install --prefix backend",
+    "verificar": "node herramientas/verificar-normas.mjs"
+  },
+  "license": "MIT"
+}

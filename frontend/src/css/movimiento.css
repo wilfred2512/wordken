@@ -1,0 +1,230 @@
+/* =============================================================================
+   MOVIMIENTO: que nada esté del todo quieto.
+
+   Este es el cuarto archivo de animación y el último que se carga. Los otros
+   tres ya reparten el trabajo así:
+     · efectos.css            los golpes de la partida
+     · efectos-interfaz.css   la reacción de los controles al tocarlos
+     · vida-propia.css        lo que late solo en cada pantalla
+   Aquí va el movimiento de fondo —el balanceo, la respiración, el temblor—
+   y la respuesta al PULSAR de todo lo pulsable.
+
+   ---------------------------------------------------------------------------
+   LA REGLA QUE HACE QUE ESTO NO ROMPA NADA
+
+   Casi todo el juego ya usa `transform`: las cartas se inclinan con el ratón
+   desde JavaScript, las de la arena están giradas, los botones se hunden al
+   pulsarlos. Una animación más sobre `transform` PISARÍA todo eso, porque
+   solo puede haber un `transform` por elemento y gana el último.
+
+   Por eso aquí casi no se usa `transform`, sino `translate`, `rotate` y
+   `scale`, que son propiedades independientes y se COMPONEN con el
+   `transform` que ya tenga el elemento. Una carta puede estar inclinada por
+   el ratón (transform), flotando (translate) y hundida por la pulsación
+   (scale) a la vez, y cada cosa la manda quien le toca.
+
+   LA OTRA REGLA: solo se anima lo que se resuelve en la tarjeta gráfica
+   —`translate`, `rotate`, `scale`, `opacity`, `filter`—. Nada de
+   `box-shadow`, `text-shadow`, `background-position` ni `letter-spacing`:
+   esas obligan al navegador a repintar o a recalcular el diseño en cada
+   fotograma, y era de donde salían los tirones del juego.
+   ========================================================================== */
+
+/* =============================================================================
+   1 · MENÚ
+   ========================================================================== */
+
+/* Las tres cartas del menú se balancean cada una a su ritmo, como un móvil
+   de cuna. Los periodos son primos entre sí (3.4 / 4.1 / 4.7) para que no
+   vuelvan a coincidir nunca y no se vea el bucle. */
+.cartas-menu .carta-mini { animation: mini-vaiven 3.4s ease-in-out infinite; }
+.cartas-menu .carta-mini:nth-child(2) { animation-duration: 4.1s; animation-delay: 0.4s; }
+.cartas-menu .carta-mini:nth-child(3) { animation-duration: 4.7s; animation-delay: 0.9s; }
+
+/* Malabares: sube, cae aplastándose y vuelve a subir a medias. */
+@keyframes mini-vaiven {
+  0%, 100% { translate: 0 0; rotate: -6deg; scale: 1 1; }
+  25% { translate: 0 -28px; rotate: 9deg; scale: 1.08 1.08; }
+  50% { translate: 0 0; rotate: 4deg; scale: 1.12 0.88; }
+  75% { translate: 0 -14px; rotate: -10deg; scale: 1 1; }
+}
+
+/* Al pasar el ratón se enderezan y se acercan. */
+.cartas-menu .carta-mini:hover {
+  animation: none;
+  translate: 0 -18px;
+  scale: 1.12;
+  rotate: 0deg;
+  transition: 0.22s cubic-bezier(0.2, 1.6, 0.4, 1);
+}
+
+/* Los botones del menú NO se mueven de sitio, a propósito.
+
+   La primera versión de esto los hacía flotar cuatro píxeles, y era un
+   error: un botón que nunca se está quieto es un blanco móvil, y "JUGAR" es
+   justo el que más se pulsa del juego. (El proyecto ya había aprendido esto
+   con las fichas de poder, que se paran al pasarles el cursor por encima.)
+
+   En vez de moverlos, se les pasa un brillo por encima cada pocos segundos:
+   se ve que están vivos y siguen exactamente donde el dedo los espera. Va en
+   un `::after` propio para no tocar el `::before`, que es el del barrido del
+   hover, y se mueve con `translate`, que no cuesta repintado. */
+.botones-menu .boton { overflow: hidden; }
+
+.botones-menu .boton::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 2;
+  width: 40%;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.28), transparent);
+  animation: brillo-pasa 4.5s ease-in-out infinite;
+}
+
+.botones-menu .boton:nth-child(2)::after { animation-delay: 1.5s; }
+.botones-menu .boton:nth-child(3)::after { animation-delay: 3s; }
+
+@keyframes brillo-pasa {
+  0%, 62% { translate: -160% 0; }
+  92%, 100% { translate: 320% 0; }
+}
+
+/* =============================================================================
+   2 · PARTIDA
+   ========================================================================== */
+
+/* Las cartas de la arena flotan aunque no pase nada.
+
+   El flote va sobre el `.cara` de DENTRO, no sobre la carta. Puesto en la
+   carta pisaría sus animaciones de `revelar` y `pensando`, porque solo puede
+   haber una animación con el mismo nombre de propiedad por elemento y gana
+   la última hoja cargada, que es esta. Animando el hijo, las dos cosas
+   conviven: la carta voltea y el dibujo flota. */
+.hueco-jugador .carta-grande .cara { animation: arena-flota 3.6s ease-in-out infinite; }
+.hueco-rival .carta-grande .cara { animation: arena-flota 3.6s ease-in-out infinite 1.8s; }
+
+@keyframes arena-flota {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -9px; }
+}
+
+/* ---------- La barra de vida tiembla cuando baja ----------
+   El temblor cuelga de `.hud.es-golpeado`, la clase que ya pone el JS al
+   recibir daño, así que no hace falta tocar nada de código. Va en
+   `translate` para no pelearse con el `latido-bajo` de partida.css, que
+   anima `filter` cuando la vida está en rojo: los dos conviven. */
+.hud.es-golpeado .barra-relleno { animation: barra-tiembla 0.4s ease-out; }
+
+@keyframes barra-tiembla {
+  0%, 100% { translate: 0 0; }
+  15% { translate: -4px 0; }
+  30% { translate: 3px 0; }
+  45% { translate: -3px 0; }
+  60% { translate: 2px 0; }
+  80% { translate: -1px 0; }
+}
+
+/* El número de vida da un respingo con el mismo golpe. */
+.hud.es-golpeado .hud-vida { animation: vida-respinga 0.4s cubic-bezier(0.2, 1.8, 0.4, 1); }
+
+@keyframes vida-respinga {
+  0%, 100% { scale: 1; }
+  40% { scale: 1.28; }
+}
+
+/* ---------- Detalles del marcador ---------- */
+
+/* Los sellos conseguidos laten uno detrás de otro, como un semáforo lento.
+
+   Se repite aquí el `sello-brinca` de efectos-interfaz.css porque un
+   elemento solo tiene UNA propiedad `animation`: si aquí se pusiera nada más
+   el latido, el brinco del momento de ganarlo desaparecería. Van las dos, y
+   cada una con su retardo en el mismo orden. */
+.sello.activo {
+  animation:
+    sello-brinca 0.45s cubic-bezier(0.2, 1.7, 0.4, 1),
+    sello-late 2.4s ease-in-out infinite;
+}
+
+.sello.activo:nth-child(2) { animation-delay: 0s, 0.3s; }
+.sello.activo:nth-child(3) { animation-delay: 0s, 0.6s; }
+
+@keyframes sello-late {
+  0%, 100% { scale: 1; }
+  50% { scale: 1.14; }
+}
+
+/* El avatar del rival se mece muy poquito, aparte de su propia respiración
+   (que vive en avatar-ia.css y anima `transform`). */
+#avatar-ia { animation: avatar-mece 6.5s ease-in-out infinite; }
+
+@keyframes avatar-mece {
+  0%, 100% { rotate: -1.5deg; }
+  50% { rotate: 1.5deg; }
+}
+
+/* =============================================================================
+   3 · DUELO
+   ========================================================================== */
+
+/* Las casillas vacías respiran en diagonal: la onda recorre el tablero. */
+.casilla-duelo:not(.escrita):not(.volteada) { animation: casilla-respira 3s ease-in-out infinite; }
+.casilla-duelo:nth-child(2) { animation-delay: 0.12s; }
+.casilla-duelo:nth-child(3) { animation-delay: 0.24s; }
+.casilla-duelo:nth-child(4) { animation-delay: 0.36s; }
+.casilla-duelo:nth-child(5) { animation-delay: 0.48s; }
+.casilla-duelo:nth-child(6) { animation-delay: 0.6s; }
+
+@keyframes casilla-respira {
+  0%, 100% { opacity: 0.82; scale: 1; }
+  50% { opacity: 1; scale: 1.02; }
+}
+
+/* =============================================================================
+   4 · RESPUESTA AL PULSAR
+   Todo lo que se puede tocar se hunde al tocarlo. Va en `scale` y
+   `translate` para componerse con el `transform` que cada elemento ya tenga
+   de su estado de hover.
+   ========================================================================== */
+
+/* Las cartas de la mano no tenían respuesta al pulsar: era lo que más se
+   notaba, porque es lo que más se toca en toda la partida. */
+.carta:active:not(:disabled) { scale: 0.93; translate: 0 4px; }
+
+/* Fichas de poder de la mochila. */
+.ficha-poder:active { scale: 0.9; }
+
+/* Tarjetas del menú de premios. */
+.tarjeta-poder:active { scale: 0.95; translate: 0 3px; }
+
+/* Aspa de cerrar de las ventanas. */
+.cerrar:active { scale: 0.85; rotate: 90deg; }
+
+/* Sugerencias y envío del chat ya tienen su propio `:active` en
+   chat-ayuda.css; aquí solo se añade el del cuerpo del bocadillo. */
+.chat-burbuja:active { scale: 0.99; }
+
+/* Un hundido general para cualquier botón que se nos haya escapado. Va al
+   final y con `scale` para no pisar los `:active` concretos de botones.css,
+   que mueven la sombra para simular el relieve. */
+.boton:active:not(:disabled) { scale: 0.97; }
+
+/* =============================================================================
+   5 · RESPETAR A QUIEN NO QUIERE MOVIMIENTO
+   Si en el sistema operativo está activado "reducir movimiento", se apaga
+   todo lo que se mueve solo. Las animaciones de respuesta (pulsar, revelar)
+   se dejan: son información, no decoración.
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .cartas-menu .carta-mini,
+  .botones-menu .boton::after,
+  .carta-grande .cara,
+  .sello.activo,
+  #avatar-ia,
+  .casilla-duelo {
+    animation: none;
+  }
+}

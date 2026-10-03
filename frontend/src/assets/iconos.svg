@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" aria-hidden="true">
+  <defs>
+    <symbol id="icono-piedra" viewBox="0 0 100 100">
+      <g stroke="var(--tinta)" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+        <path d="M18 66 L12 44 L30 24 L54 16 L78 26 L88 50 L80 74 L56 86 L30 82 Z" fill="currentColor"/>
+        <path d="M30 24 L44 42 L78 26" fill="none" opacity=".55"/>
+        <path d="M44 42 L36 78" fill="none" opacity=".55"/>
+        <path d="M44 42 L80 74" fill="none" opacity=".35"/>
+        <path d="M12 44 L44 42" fill="none" opacity=".35"/>
+      </g>
+    </symbol>
+
+    <symbol id="icono-papel" viewBox="0 0 100 100">
+      <g stroke="var(--tinta)" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+        <path d="M24 12 H62 L80 32 V88 H24 Z" fill="currentColor"/>
+        <path d="M62 12 V32 H80" fill="none"/>
+        <path d="M36 46 H68 M36 58 H68 M36 70 H58" fill="none" opacity=".6"/>
+      </g>
+    </symbol>
+
+    <symbol id="icono-tijera" viewBox="0 0 100 100">
+      <g stroke="var(--tinta)" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+        <path d="M30 14 L62 68" fill="none" stroke-width="13"/>
+        <path d="M70 14 L38 68" fill="none" stroke-width="13"/>
+        <path d="M30 14 L62 68" fill="none" stroke="currentColor" stroke-width="6"/>
+        <path d="M70 14 L38 68" fill="none" stroke="currentColor" stroke-width="6"/>
+        <circle cx="66" cy="78" r="12" fill="currentColor"/>
+        <circle cx="34" cy="78" r="12" fill="currentColor"/>
+        <circle cx="66" cy="78" r="4.5" fill="var(--tinta)" stroke="none"/>
+        <circle cx="34" cy="78" r="4.5" fill="var(--tinta)" stroke="none"/>
+        <circle cx="50" cy="44" r="6" fill="var(--tinta)" stroke="none"/>
+      </g>
+    </symbol>
+
+    <symbol id="icono-pistola" viewBox="0 0 100 100">
+      <g stroke="var(--tinta)" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+        <path d="M14 30 H78 V50 H60 L52 66 H34 L30 50 H14 Z" fill="currentColor"/>
+        <path d="M30 50 L20 82 H40 L46 58" fill="currentColor"/>
+        <circle cx="34" cy="40" r="5" fill="var(--tinta)" stroke="none"/>
+        <path d="M78 36 H90" fill="none" stroke-width="7"/>
+      </g>
+    </symbol>
+
+    <symbol id="icono-escudo" viewBox="0 0 100 100">
+      <g stroke="var(--tinta)" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+        <path d="M50 10 L84 24 V52 C84 72 68 84 50 90 C32 84 16 72 16 52 V24 Z" fill="currentColor"/>
+        <path d="M50 10 V90" fill="none" opacity=".45"/>
+        <path d="M16 44 H84" fill="none" opacity=".45"/>
+        <path d="M34 54 L46 66 L70 40" fill="none" stroke="var(--tinta)" stroke-width="8"/>
+      </g>
+    </symbol>
+
+    <symbol id="icono-oculto" viewBox="0 0 100 100">
+      <g fill="none" stroke="currentColor" stroke-width="11" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M32 36 a18 18 0 1 1 22 24 v8"/>
+        <path d="M54 80 v1"/>
+      </g>
+    </symbol>
+  </defs>
+</svg>

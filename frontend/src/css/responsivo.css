@@ -1,0 +1,104 @@
+/* =============================================================================
+   Diseño adaptable. Tres saltos:
+     · pantallas bajas (portátiles): se recortan alturas
+     · tabletas
+     · móviles: la arena pasa a vertical y el teclado del duelo se estrecha
+   ========================================================================== */
+
+@media (max-height: 760px) {
+  .carta-pie { display: none; }
+  .medidor { width: 66px; height: 66px; }
+  .rejilla-partida { gap: 7px; padding: 10px 14px 8px; }
+  .hueco-etiqueta { font-size: 11px; }
+  .mano { padding-top: 6px; }
+  .carta-mini { width: 66px; height: 92px; }
+  .carta-mini svg { width: 44px; height: 44px; }
+  .cartas-menu { gap: 12px; }
+}
+
+@media (max-width: 860px) {
+  .rejilla-partida { padding: 12px 12px 10px; }
+  .centro-arena { min-width: 130px; }
+  .carta-pie { display: none; }
+  .hud-dificultad { display: none; }
+}
+
+/* Pantallas de verdad bajas: se recorta todo lo que no es imprescindible. */
+@media (max-height: 620px) {
+  .hueco-etiqueta,
+  .tira-etiqueta,
+  .contador-empates { display: none; }
+
+  .medidor { width: 54px; height: 54px; }
+  .medidor-texto { font-size: 9px; }
+  .boton-duelo { padding: 0.3em 0.8em; font-size: 12px; }
+  .veredicto { min-height: 1.8em; font-size: 10px; }
+  .mochila { min-height: 0; }
+  .ficha-poder { font-size: 11px; padding: 0.15em 0.45em; }
+  .barra { height: 15px; }
+  .hud { padding: 6px 11px; gap: 5px; }
+  .hud-vida b { font-size: 19px; }
+  .sello { width: 24px; height: 24px; }
+  .sello svg { width: 14px; height: 14px; }
+}
+
+@media (max-width: 640px) {
+  body { font-size: 15px; }
+
+  .boton { font-size: 17px; padding: 0.55em 1.2em; }
+  .boton-grande { font-size: 20px; }
+
+  .rejilla-partida { gap: 8px; padding: 10px 8px 8px; }
+
+  /* La arena pasa a columna: las dos cartas arriba y el centro debajo. */
+  .arena {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas: "jugador rival" "centro centro";
+    gap: 8px;
+  }
+
+  .hueco-jugador { grid-area: jugador; }
+  .hueco-rival { grid-area: rival; }
+  .centro-arena { grid-area: centro; flex-direction: row; flex-wrap: wrap; justify-content: center; }
+
+  .veredicto { flex-basis: 100%; font-size: 10px; }
+  .carta-grande { height: clamp(76px, 17vh, 132px); }
+
+  .mano { gap: 8px; padding-top: 8px; }
+  .carta { height: clamp(96px, 19vh, 150px); border-width: 4px; }
+  .carta-titulo { font-size: 8px; }
+
+  .tira-etiqueta { display: none; }
+
+  .selector { flex-direction: column; }
+  .selector .opcion { flex-direction: row; gap: 8px; justify-content: center; }
+
+  .datos-duelo .dato { min-width: 90px; font-size: 13px; }
+  .tecla { padding: 0.6em 0; font-size: 13px; }
+  .tecla.ancha { font-size: 10px; }
+  .duelo-reloj { font-size: 17px; }
+
+  .fila-ranking { grid-template-columns: 1.8em 1fr 4em 3.4em 3.4em; font-size: 14px; }
+  .opciones-poder { grid-template-columns: 1fr; padding: 14px; }
+}
+
+/* Quien haya pedido menos animación en su sistema, que tenga menos.
+
+   Antes esto apagaba TODAS las animaciones del juego (a 0.01 ms), y como
+   Windows trae "reducir movimiento" activado en muchos equipos, había quien
+   no veía ni una: el juego parecía estático y no había forma de saber por
+   qué. Ahora se para lo que de verdad puede marear —las sacudidas y zooms de
+   pantalla completa, los destellos y la viñeta que late— y lo decorativo de
+   frenesi.css y movimiento.css. Las animaciones que cuentan qué ha pasado
+   (revelar cartas, impactos, el jackpot) se quedan: son información. */
+@media (prefers-reduced-motion: reduce) {
+  #aplicacion.fx-golpe,
+  #aplicacion.fx-golpe-fuerte,
+  #aplicacion.fx-sacudida,
+  #aplicacion.fx-sacudida-fuerte,
+  #fx-destello,
+  #aplicacion.destello-maximo::before,
+  body.en-peligro::after {
+    animation: none !important;
+  }
+}

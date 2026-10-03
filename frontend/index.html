@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Piedra, papel o tijera con cadenas, poderes y duelos de palabras.">
+  <title>Mini proyecto RA1 — piedra, papel o tijera</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="src/css/base.css">
+  <link rel="stylesheet" href="src/css/botones.css">
+  <link rel="stylesheet" href="src/css/menu.css">
+  <link rel="stylesheet" href="src/css/modales.css">
+  <link rel="stylesheet" href="src/css/partida.css">
+  <link rel="stylesheet" href="src/css/cartas.css">
+  <link rel="stylesheet" href="src/css/carga-y-poderes.css">
+  <link rel="stylesheet" href="src/css/duelo.css">
+  <link rel="stylesheet" href="src/css/efectos.css">
+  <link rel="stylesheet" href="src/css/efectos-interfaz.css">
+  <link rel="stylesheet" href="src/css/fanfarrias.css">
+  <link rel="stylesheet" href="src/css/avatar-ia.css">
+  <link rel="stylesheet" href="src/css/chat-ayuda.css">
+  <link rel="stylesheet" href="src/css/vida-propia.css">
+  <link rel="stylesheet" href="src/css/movimiento.css">
+  <link rel="stylesheet" href="src/css/impactos.css">
+  <link rel="stylesheet" href="src/css/impactos-armas.css">
+  <link rel="stylesheet" href="src/css/impactos-extra.css">
+  <link rel="stylesheet" href="src/css/jackpot.css">
+  <link rel="stylesheet" href="src/css/jackpot-fiesta.css">
+  <link rel="stylesheet" href="src/css/frenesi.css">
+  <link rel="stylesheet" href="src/css/responsivo.css">
+  <script type="module" src="src/js/main.js"></script>
+</head>
+<body>
+<div id="fondo" aria-hidden="true">
+  <div class="mancha mancha-1"></div>
+  <div class="mancha mancha-2"></div>
+  <div class="mancha mancha-3"></div>
+  <div class="mancha mancha-4"></div>
+  <div class="vineta"></div>
+  <div class="lineas"></div>
+</div>
+<button id="boton-sonido" class="boton-sonido" type="button" aria-label="Silenciar o activar el sonido">&#9834;</button>
+
+<div id="aplicacion">
+  <!-- ===================== PANTALLA 1 · MENÚ ===================== -->
+  <section id="pantalla-menu" class="pantalla es-activa">
+    <div class="envoltorio-menu">
+      <div class="logotipo">
+        <p class="logotipo-encima">piedra &middot; papel &middot; tijera</p>
+        <h1 id="titulo-juego" class="logotipo-titulo"></h1>
+        <p id="lema-juego" class="logotipo-lema"></p>
+      </div>
+      <div class="cartas-menu" aria-hidden="true">
+        <div class="carta-mini m-piedra"><svg><use href="#icono-piedra"></use></svg></div>
+        <div class="carta-mini m-papel"><svg><use href="#icono-papel"></use></svg></div>
+        <div class="carta-mini m-tijera"><svg><use href="#icono-tijera"></use></svg></div>
+      </div>
+      <nav class="botones-menu">
+        <button id="boton-jugar" class="boton boton-grande boton-rojo" type="button">JUGAR</button>
+        <button id="boton-reglas" class="boton boton-azul" type="button">CÓMO SE JUEGA</button>
+        <button id="boton-ranking" class="boton boton-fantasma" type="button">PUNTUACIONES</button>
+      </nav>
+  
+    </div>
+  </section>
+
+  <!-- ===================== PANTALLA 2 · PARTIDA ===================== -->
+  <section id="pantalla-partida" class="pantalla">
+    <div class="rejilla-partida">
+      <div id="hud-ia" class="hud hud-rival">
+        <div class="hud-linea">
+          <span class="hud-nombre" id="nombre-ia">IA</span>
+          <span class="hud-dificultad" id="etiqueta-dificultad">NORMAL</span>
+          <span class="hud-vida"><b id="vida-actual-ia">20</b><i>/<span id="vida-maxima-ia">20</span></i></span>
+        </div>
+        <div class="barra"><div class="barra-fantasma" id="fantasma-ia"></div><div class="barra-relleno rival" id="barra-ia"></div></div>
+        <div class="hud-linea">
+          <div class="insignia-cadena" id="insignia-ia"><span class="insignia-multiplicador">x1</span><span class="insignia-texto">SIN CADENA</span></div>
+          <div class="sellos" id="sellos-ia">
+            <div class="sello" data-tirada="piedra"><svg><use href="#icono-piedra"></use></svg></div>
+            <div class="sello" data-tirada="papel"><svg><use href="#icono-papel"></use></svg></div>
+            <div class="sello" data-tirada="tijera"><svg><use href="#icono-tijera"></use></svg></div>
+          </div>
+        </div>
+        <div class="mochila vacia" id="mochila-ia"></div>
+      </div>
+      <div class="arena">
+        <div class="hueco hueco-jugador">
+          <p class="hueco-etiqueta">TÚ</p>
+          <div class="carta-grande" id="carta-jugador"><span class="cara"><svg><use href="#icono-oculto"></use></svg></span></div>
+        </div>
+        <div class="centro-arena">
+          <p class="ficha-ronda">RONDA <b id="numero-ronda">1</b></p>
+          <div class="medidor" id="medidor-carga">
+            <svg viewBox="0 0 80 80" aria-hidden="true">
+              <circle class="circulo-fondo" cx="40" cy="40" r="34"></circle>
+              <circle class="circulo-relleno" id="circulo-carga-relleno" cx="40" cy="40" r="34"></circle>
+            </svg>
+            <span class="medidor-texto" id="carga-texto">0/6</span>
+          </div>
+          <button id="boton-duelo" class="boton boton-duelo" type="button" disabled>
+            DUELO<span class="duelo-contador"></span>
+          </button>
+
+          <p class="veredicto" id="veredicto">ELIGE TU TIRADA</p>
+          <p class="contador-empates" id="contador-empates" hidden><span>EMPATES</span><b>0</b><i>/5</i></p>
+        </div>
+
+        <div class="hueco hueco-rival">
+          <div class="carta-grande" id="carta-ia"><span class="cara"><svg><use href="#icono-oculto"></use></svg></span></div>
+        </div>
+      </div>
+
+      <div id="hud-jugador" class="hud hud-propio">
+        <div class="mochila vacia" id="mochila-jugador"></div>
+        <div class="hud-linea">
+          <div class="insignia-cadena" id="insignia-jugador"><span class="insignia-multiplicador">x1</span><span class="insignia-texto">SIN CADENA</span></div>
+          <div class="sellos" id="sellos-jugador">
+            <div class="sello" data-tirada="piedra"><svg><use href="#icono-piedra"></use></svg></div>
+            <div class="sello" data-tirada="papel"><svg><use href="#icono-papel"></use></svg></div>
+            <div class="sello" data-tirada="tijera"><svg><use href="#icono-tijera"></use></svg></div>
+          </div>
+        </div>
+        <div class="barra"><div class="barra-fantasma" id="fantasma-jugador"></div><div class="barra-relleno propio" id="barra-jugador"></div></div>
+        <div class="hud-linea">
+          <span class="hud-nombre" id="nombre-jugador">TÚ</span>
+          <span class="hud-vida"><b id="vida-actual-jugador">20</b><i>/<span id="vida-maxima-jugador">20</span></i></span>
+        </div>
+      </div>
+
+      <div class="mano" id="mano">
+        <button class="carta m-piedra" type="button" data-tirada="piedra">
+          <span class="carta-interior"><span class="carta-titulo">PIEDRA</span><svg class="carta-icono"><use href="#icono-piedra"></use></svg><span class="carta-pie">rompe la tijera</span></span>
+        </button>
+        <button class="carta m-papel" type="button" data-tirada="papel">
+          <span class="carta-interior"><span class="carta-titulo">PAPEL</span><svg class="carta-icono"><use href="#icono-papel"></use></svg><span class="carta-pie">envuelve la piedra</span></span>
+        </button>
+        <button class="carta m-tijera" type="button" data-tirada="tijera">
+          <span class="carta-interior"><span class="carta-titulo">TIJERA</span><svg class="carta-icono"><use href="#icono-tijera"></use></svg><span class="carta-pie">corta el papel</span></span>
+        </button>
+        <button class="carta m-pistola" type="button" data-tirada="pistola" hidden>
+          <span class="carta-interior"><span class="carta-titulo">PISTOLA</span><svg class="carta-icono"><use href="#icono-pistola"></use></svg><span class="carta-pie">les gana a las tres</span></span>
+        </button>
+        <button class="carta m-escudo" type="button" data-tirada="escudo" hidden>
+          <span class="carta-interior"><span class="carta-titulo">ESCUDO</span><svg class="carta-icono"><use href="#icono-escudo"></use></svg><span class="carta-pie">solo para la pistola</span></span>
+        </button>
+      </div>
+
+      <div class="tira-historial">
+        <span class="tira-etiqueta">HISTORIAL</span>
+        <div class="historial" id="historial"></div>
+        <button id="boton-pausa" class="boton boton-diminuto boton-fantasma" type="button">PAUSA</button>
+      </div>
+    </div>
+
+    <div class="cartel-cadena" id="cartel-cadena" aria-hidden="true">
+      <div class="cartel-interior"><span class="cartel-titulo"></span><span class="cartel-subtitulo"></span></div>
+    </div>
+  </section>
+
+  <!-- ===================== PANTALLA 3 · DUELO DE PALABRAS ===================== -->
+  <section id="pantalla-duelo" class="pantalla">
+    <div class="rejilla-duelo">
+      <header class="cabecera-duelo">
+        <p class="duelo-rotulo">DUELO DE PALABRAS <b id="duelo-numero">1</b></p>
+        <p class="duelo-reloj" id="reloj-duelo">0:45</p>
+      </header>
+      <div class="carril-tiempo"><div class="barra-tiempo" id="barra-tiempo"></div></div>
+      <div class="datos-duelo">
+        <p class="dato"><span>TIPO</span><strong id="tipo-duelo">—</strong></p>
+        <p class="dato"><span>DE DÓNDE</span><strong id="region-duelo">—</strong></p>
+        <p class="dato"><span>LETRAS</span><strong id="letras-duelo">5</strong></p>
+        <p class="dato"><span>INTENTOS</span><strong id="intentos-duelo">0/5</strong></p>
+      </div>
+      <p class="pista-duelo" id="pista-duelo">—</p>
+      <p class="pista-duelo oculta" id="pista-extra-duelo">—</p>
+      <div class="tablero-duelo" id="tablero-duelo"></div>
+      <p class="mensaje-duelo" id="mensaje-duelo"></p>
+      <div class="teclado-duelo" id="teclado-duelo"></div>
+    </div>
+  </section>
+</div>
+<!-- ===================== VENTANAS MODALES ===================== -->
+<div class="modal" id="modal-configuracion" hidden>
+  <div class="tarjeta-modal">
+    <div class="cabecera-modal">
+      <h2>CONFIGURAR PARTIDA</h2>
+      <button class="cerrar" type="button" data-cerrar="modal-configuracion" aria-label="Cerrar">&#10005;</button>
+    </div>
+    <div class="cuerpo-modal">
+      <div class="campo">
+        <label for="campo-nombre">TU NOMBRE</label>
+        <input type="text" id="campo-nombre" maxlength="14" placeholder="Jugador" autocomplete="off">
+      </div>
+      <div class="campo">
+        <div class="campo-cabecera"><label for="campo-vida">VIDA INICIAL</label><span class="apunte">máximo 1000</span></div>
+        <div class="fila-vida" id="fila-vida-compartida">
+          <input type="number" id="campo-vida" min="1" step="1" inputmode="numeric" autocomplete="off">
+          <button class="boton-separar" id="boton-separar" type="button" title="Configurar tu vida y la de la IA por separado">+</button>
+        </div>
+        <div class="fila-vida-doble" id="fila-vida-separada" hidden>
+          <div class="columna-vida"><label for="campo-vida-jugador">TU VIDA</label><input type="number" id="campo-vida-jugador" min="1" step="1" inputmode="numeric"></div>
+          <div class="columna-vida"><label for="campo-vida-ia">VIDA IA</label><input type="number" id="campo-vida-ia" min="1" step="1" inputmode="numeric"></div>
+          <button class="boton-separar abierto" id="boton-unir" type="button" title="Usar la misma vida para los dos">&minus;</button>
+        </div>
+        <div class="atajos">
+          <button class="atajo-vida" type="button" data-vida="10">10</button>
+          <button class="atajo-vida" type="button" data-vida="20">20</button>
+          <button class="atajo-vida" type="button" data-vida="50">50</button>
+          <button class="atajo-vida" type="button" data-vida="100">100</button>
+          <button class="atajo-vida" type="button" data-vida="250">250</button>
+        </div>
+      </div>
+      <div class="campo">
+        <div class="campo-cabecera"><label for="campo-carga">CARGA PARA EL DUELO</label><span class="apunte">daño hasta el Wordle</span></div>
+        <input type="number" id="campo-carga" min="1" step="1" inputmode="numeric" autocomplete="off">
+      </div>
+      <div class="campo">
+        <label>DIFICULTAD DE LA IA</label>
+        <div class="selector" id="selector-dificultad">
+          <button class="opcion" type="button" data-dificultad="facil">FÁCIL<small>al azar</small></button>
+          <button class="opcion activa" type="button" data-dificultad="normal">NORMAL<small>lee patrones</small></button>
+          <button class="opcion" type="button" data-dificultad="dificil">DIFÍCIL<small>te predice</small></button>
+          <button class="opcion" type="button" data-dificultad="mente">EL GENIO<small>IA de verdad</small></button>
+        </div>
+        <div class="ficha-personaje" id="ficha-personaje"></div>
+      </div>
+      <p class="resumen" id="resumen-configuracion"></p>
+    </div>
+    <div class="pie-modal">
+      <button class="boton boton-fantasma" type="button" data-cerrar="modal-configuracion">ATRÁS</button>
+      <button class="boton boton-rojo boton-grande" id="boton-empezar" type="button">¡A JUGAR!</button>
+    </div>
+  </div>
+</div>
+<div class="modal" id="modal-reglas" hidden>
+  <div class="tarjeta-modal">
+    <div class="cabecera-modal"><h2>CÓMO SE JUEGA</h2><button class="cerrar" type="button" data-cerrar="modal-reglas" aria-label="Cerrar">&#10005;</button></div>
+    <div class="cuerpo-modal reglas">
+      <p class="regla"><b class="clave">BÁSICO</b> Piedra rompe tijera, tijera corta papel, papel envuelve piedra. El <b>empate</b> no hace daño y <b>no rompe la cadena</b>.</p>
+      <p class="regla"><b class="clave azul">DOBLE CADENA &middot; x2</b> Gana <b>2 o más rondas seguidas</b> y el daño se duplica.</p>
+      <p class="regla"><b class="clave naranja">TRIPLE CADENA &middot; x3</b> Si esa racha la consigues <b>con la misma tirada</b>, el daño se triplica y esa tirada queda <b>sellada</b>.</p>
+      <p class="regla"><b class="clave morada">CADENA MÁXIMA</b> Sella las <b>tres</b> tiradas y ganas al instante. Si una cadena se rompe <b>sin</b> sellar nada, pierdes los sellos.</p>
+      <p class="regla"><b class="clave verde">CÍRCULO DE CARGA</b> El daño que le haces a la IA llena el círculo del centro. Al llenarse se enciende el botón <b>DUELO</b>.</p>
+      <p class="regla"><b class="clave amarilla">DUELO DE PALABRAS</b> Un Wordle de jergas del español a contrarreloj. Si aciertas eliges una <b>bonificación</b>; si fallas, se la queda <b>la IA</b>.</p>
+      <p class="regla"><b class="clave azul">PISTOLA Y ESCUDO</b> La <b>pistola</b> gana a las tres tiradas, pero al activarla el rival recibe un <b>escudo</b>, que solo sirve para pararla y <b>pierde contra todo lo demás</b>. Disparar es una apuesta y escudarse también.</p>
+      <p class="regla"><b class="clave roja">TECLAS</b> 1, 2 y 3 eligen tirada, 4 dispara la pistola, 5 levanta el escudo, D abre el duelo y P pausa.</p>
+    </div>
+    <div class="pie-modal centrado"><button class="boton boton-azul boton-grande" type="button" data-cerrar="modal-reglas">ENTENDIDO</button></div>
+  </div>
+</div>
+<div class="modal modal-aviso" id="modal-aviso" hidden>
+  <div class="tarjeta-modal tarjeta-aviso" id="tarjeta-aviso">
+    <p class="aviso-signo">!</p>
+    <h2 id="aviso-titulo">AVISO</h2>
+    <p id="aviso-mensaje"></p>
+    <button class="boton boton-naranja boton-grande" type="button" data-cerrar="modal-aviso">VALE, VALE</button>
+  </div>
+</div>
+<div class="modal" id="modal-premio" hidden>
+  <div class="tarjeta-modal tarjeta-premio">
+    <div class="cabecera-modal"><h2>¡DUELO GANADO!</h2></div>
+    <p class="premio-subtitulo" id="premio-subtitulo"></p>
+    <div class="opciones-poder" id="opciones-poder"></div>
+  </div>
+</div>
+<div class="modal" id="modal-pausa" hidden>
+  <div class="tarjeta-modal tarjeta-pausa">
+    <div class="cabecera-modal"><h2>PAUSA</h2></div>
+    <p class="aviso-pausa">La música está parada. Pulsa <b>P</b> o <b>Esc</b> para seguir.</p>
+    <div class="pie-modal centrado">
+      <button class="boton boton-fantasma" id="boton-abandonar" type="button">ABANDONAR</button>
+      <button class="boton boton-azul" id="boton-reanudar" type="button">SEGUIR</button>
+    </div>
+  </div>
+</div>
+<div class="modal" id="modal-ranking" hidden>
+  <div class="tarjeta-modal">
+    <div class="cabecera-modal"><h2>TABLA DE PUNTUACIONES</h2><button class="cerrar" type="button" data-cerrar="modal-ranking" aria-label="Cerrar">&#10005;</button></div>
+    <div class="cuerpo-modal"><div class="tabla-ranking" id="tabla-ranking"></div></div>
+  </div>
+</div>
+<div class="modal" id="modal-fin" hidden>
+  <div class="tarjeta-modal tarjeta-fin" id="tarjeta-fin">
+    <p class="cinta-fin" id="cinta-fin">VICTORIA</p>
+    <h2 id="titulo-fin">¡HAS GANADO!</h2>
+    <p id="subtitulo-fin"></p>
+    <div class="estadisticas-fin" id="estadisticas-fin"></div>
+    <p class="estado-guardado" id="estado-guardado"></p>
+    <div class="pie-modal centrado">
+      <button class="boton boton-fantasma" id="boton-menu-final" type="button">MENÚ</button>
+      <button class="boton boton-rojo boton-grande" id="boton-revancha" type="button">REVANCHA</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>

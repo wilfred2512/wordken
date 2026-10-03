@@ -1,0 +1,242 @@
+/* =============================================================================
+   IMPACTOS (1/3): la habilidad cae encima de lo que toca.
+
+   Este archivo tiene la base, las reacciones, el martillo, los dados y el
+   espejo. Las armas (pistola, escudo, bomba) están en impactos-armas.css y
+   el resto en impactos-extra.css.
+
+   render/impactos.js coloca una capa invisible (.impacto) justo sobre el
+   elemento golpeado y le pasa estas variables:
+     --dx --dy   desde dónde sale el proyectil, relativo al punto de impacto
+     --rx --ry   a dónde rebota (solo el espejo)
+     --dura      cuánto dura la escena; los % de cada @keyframes van contra
+                 ella, y el "golpe" de escenas-impacto.js cae en ese %
+   Aquí solo se mueven `translate`, `rotate`, `scale`, `opacity` y `filter`.
+
+   Truco de centrado: cada actor se centra con márgenes negativos y NO con
+   transform. Así `rotate` y `scale` giran el actor sobre sí mismo en vez de
+   sacarlo de su sitio.
+   ========================================================================== */
+
+.impacto {
+  --dx: 0px;
+  --dy: 0px;
+  --rx: 0px;
+  --ry: 0px;
+  --dura: 1200ms;
+  --boca: 0.42em;
+  --culata: -16deg;
+  position: fixed;
+  z-index: 58;
+  width: 0;
+  height: 0;
+  font-size: clamp(44px, 8.5vmin, 92px);
+  pointer-events: none;
+}
+
+/* Disparando hacia la izquierda (la IA), el cañón y el culatazo se invierten. */
+.impacto.hacia-izquierda { --boca: -0.42em; --culata: 16deg; }
+.impacto.hacia-izquierda .arma { transform: scaleX(-1); }
+
+.impacto i {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1em;
+  height: 1em;
+  margin: -0.5em 0 0 -0.5em;
+  font-style: normal;
+  line-height: 1;
+  text-align: center;
+  opacity: 0;
+  animation-duration: var(--dura);
+  animation-fill-mode: both;
+}
+
+.impacto i i { margin: 0; }
+
+/* ---------- La etiqueta que dice qué ha pasado ---------- */
+.impacto-etiqueta {
+  position: absolute;
+  top: -1.5em;
+  left: 0;
+  width: 20em;
+  /* --ex la calcula impactos.js cuando el golpe cae cerca de un borde. Va en
+     el margen y no en `translate`, que ya lo usa la animación de entrada. */
+  margin-left: calc(-10em + var(--ex, 0px));
+  font-family: var(--fuente-titular);
+  font-size: clamp(12px, 2.2vmin, 21px);
+  letter-spacing: 0.06em;
+  text-align: center;
+  color: var(--crema);
+  -webkit-text-stroke: 4px var(--tinta);
+  paint-order: stroke fill;
+  animation: etiqueta-impacto var(--dura) cubic-bezier(0.2, 1.6, 0.4, 1) both;
+}
+
+.impacto.etiqueta-abajo .impacto-etiqueta { top: 3.4em; }
+.impacto.es-rival .impacto-etiqueta { color: #ffd9d6; }
+
+@keyframes etiqueta-impacto {
+  0% { opacity: 0; scale: 0.4; translate: 0 12px; }
+  16% { opacity: 1; scale: 1.18; translate: 0 0; }
+  26% { scale: 1; }
+  86% { opacity: 1; }
+  100% { opacity: 0; translate: 0 -14px; }
+}
+
+/* Anillo de choque genérico: lo usan el martillo y la bomba. */
+.impacto .onda { border: 0.07em solid #fff; border-radius: 50%; }
+
+/* =============================================================================
+   REACCIONES de lo golpeado. impactos.js las quita al terminar para que no
+   se queden pisando la animación propia de cada elemento.
+   ========================================================================== */
+.barra.recibe-impacto { animation: barra-aplastada 0.5s cubic-bezier(0.2, 1.6, 0.4, 1); }
+
+@keyframes barra-aplastada {
+  0%, 100% { scale: 1 1; translate: 0 0; }
+  18% { scale: 1.03 2; }
+  38% { scale: 0.98 0.75; translate: -6px 0; }
+  58% { scale: 1 1.25; translate: 5px 0; }
+  78% { translate: -2px 0; }
+}
+
+.barra.recibe-cura { animation: barra-cura 0.7s ease-out; }
+
+@keyframes barra-cura {
+  0%, 100% { scale: 1 1; filter: none; }
+  30% { scale: 1 1.6; filter: brightness(1.9) saturate(1.5); }
+}
+
+.carta-grande.recibe-disparo { animation: carta-baleada 0.55s ease-out; }
+
+@keyframes carta-baleada {
+  0%, 100% { translate: 0 0; rotate: 0deg; }
+  14% { translate: 12px -6px; rotate: 7deg; }
+  34% { translate: -9px 3px; rotate: -6deg; }
+  58% { translate: 5px 0; rotate: 2deg; }
+}
+
+.recibe-cerrojo { animation: sacudida-cerrojo 0.45s ease-out; }
+
+@keyframes sacudida-cerrojo {
+  0%, 100% { translate: 0 0; }
+  20% { translate: 0 6px; }
+  40% { translate: -5px 0; }
+  60% { translate: 5px 0; }
+  80% { translate: -2px 0; }
+}
+
+.sello.recibe-sello { animation: sello-robado 0.6s cubic-bezier(0.2, 1.8, 0.4, 1); }
+
+@keyframes sello-robado {
+  0%, 100% { scale: 1; rotate: 0deg; }
+  40% { scale: 1.8; rotate: -14deg; }
+  70% { scale: 0.9; rotate: 6deg; }
+}
+
+/* =============================================================================
+   MARTILLO · golpe a los 560 ms (49 %)
+   El mango se queda quieto (transform-origin) y la cabeza baja trazando un
+   arco hasta el borde de la barra. Los números salen de girar la cabeza 80°
+   alrededor del mango: acaba justo en el punto de impacto.
+   ========================================================================== */
+.impacto-martillo .actor {
+  transform-origin: 22% 84%;
+  animation-name: martillazo;
+  animation-timing-function: cubic-bezier(0.3, 0.7, 0.3, 1);
+}
+
+@keyframes martillazo {
+  0% { opacity: 0; translate: -1.3em -2.6em; rotate: -70deg; scale: 0.6; }
+  16% { opacity: 1; translate: -0.35em -0.95em; rotate: -15deg; scale: 1.15; }
+  38% { rotate: -45deg; scale: 1.2; }
+  49% { rotate: 82deg; scale: 1; }
+  56% { rotate: 68deg; }
+  64% { rotate: 78deg; }
+  /* `translate` se repite aquí a propósito: si solo estuviera al 16 % y al
+     100 %, el navegador lo iría interpolando por el camino y el martillo se
+     deslizaría durante el golpe en vez de caer en el punto exacto. */
+  86% { opacity: 1; rotate: 72deg; translate: -0.35em -0.95em; }
+  100% { opacity: 0; translate: -0.6em -1.8em; rotate: 20deg; scale: 0.7; }
+}
+
+.impacto-martillo .choque { animation-name: choque; animation-timing-function: ease-out; }
+
+@keyframes choque {
+  0%, 46% { opacity: 0; scale: 0.2; }
+  50% { opacity: 1; scale: 1.7; rotate: -12deg; }
+  70% { opacity: 0.9; scale: 2.1; rotate: 8deg; }
+  100% { opacity: 0; scale: 2.5; }
+}
+
+.impacto-martillo .onda { border-color: var(--amarillo); animation-name: onda-martillo; }
+
+@keyframes onda-martillo {
+  0%, 47% { opacity: 0; scale: 0.2; }
+  50% { opacity: 1; scale: 0.5; }
+  100% { opacity: 0; scale: 3.6; }
+}
+
+/* =============================================================================
+   DOBLE O NADA · los dados caen a los 980 ms (70 %)
+   Salen de la carta del apostante trazando un arco hasta el centro.
+   ========================================================================== */
+.impacto .dado { font-size: 0.8em; animation-name: dado-tirado; animation-timing-function: ease-out; }
+.impacto .dado.d1 { --ox: -0.6em; }
+.impacto .dado.d2 { --ox: 0.6em; animation-delay: 70ms; }
+
+@keyframes dado-tirado {
+  0% { opacity: 0; translate: var(--dx) var(--dy); rotate: 0deg; scale: 0.6; }
+  8% { opacity: 1; }
+  45% { translate: calc(var(--dx) * 0.5 + var(--ox) * 0.5) calc(var(--dy) * 0.5 - 1.8em); rotate: 420deg; scale: 1.2; }
+  70% { translate: var(--ox) 0; rotate: 700deg; scale: 1; }
+  78% { translate: var(--ox) -0.3em; rotate: 720deg; }
+  86% { translate: var(--ox) 0; }
+  94% { opacity: 1; }
+  100% { opacity: 0; translate: var(--ox) 0; rotate: 720deg; }
+}
+
+/* =============================================================================
+   ESPEJO · el golpe choca con el espejo (40 %) y rebota al rival (70 %)
+   ========================================================================== */
+.impacto-espejo .espejo { animation-name: espejo-gira; }
+
+@keyframes espejo-gira {
+  0% { opacity: 0; scale: -0.2 1.2; translate: 0 -0.2em; }
+  22% { opacity: 1; scale: 1.2 1.2; }
+  32% { scale: 1 1; }
+  40% { scale: 1.2 0.85; filter: brightness(2.2); }
+  50% { scale: 1 1; filter: none; }
+  86% { opacity: 1; translate: 0 -0.2em; }
+  100% { opacity: 0; scale: 0.7 0.7; translate: 0 -0.2em; }
+}
+
+.impacto .orbe {
+  width: 0.45em;
+  height: 0.45em;
+  margin: -0.22em 0 0 -0.22em;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 0 20%, #fe5f55 45%, transparent 70%);
+  animation-name: orbe-rebota;
+  animation-timing-function: linear;
+}
+
+@keyframes orbe-rebota {
+  0%, 16% { opacity: 0; translate: var(--dx) var(--dy); scale: 0.6; }
+  20% { opacity: 1; }
+  40% { translate: 0 -0.2em; scale: 1.3; }
+  42% { filter: hue-rotate(160deg); }
+  70% { opacity: 1; translate: var(--rx) var(--ry); scale: 1.6; filter: hue-rotate(160deg); }
+  74%, 100% { opacity: 0; translate: var(--rx) var(--ry); }
+}
+
+.impacto-espejo .choque { font-size: 0.8em; animation-name: destello-espejo; }
+
+@keyframes destello-espejo {
+  0%, 38% { opacity: 0; scale: 0.3; translate: 0 -0.2em; }
+  42% { opacity: 1; scale: 1.8; }
+  60% { opacity: 0; scale: 2.4; translate: 0 -0.2em; }
+  100% { opacity: 0; }
+}

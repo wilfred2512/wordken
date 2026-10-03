@@ -1,0 +1,284 @@
+/* =============================================================================
+   FANFARRIAS DE PODER: el aviso a pantalla completa de cada habilidad.
+
+   La estructura es siempre la misma (rayos, dos anillos, símbolo, nombre) y lo
+   que cambia por poder es el GESTO: la clase `gesto-disparo`, `gesto-dados`...
+   la pone el JS leyendo el catálogo. Añadir un poder nuevo con animación
+   propia es escribir un bloque aquí abajo, sin tocar nada del resto.
+
+   Todo se anima con `transform`, `opacity` y `filter`, que son las tres
+   propiedades que el navegador puede dejar en manos de la tarjeta gráfica.
+   La capa no existe en el HTML: la crea render/fanfarria-poder.js.
+   ========================================================================== */
+
+#fx-fanfarria {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  --color-poder: var(--morado);
+
+  /* El aviso se centra sobre la ARENA, no sobre la ventana: dejando hueco
+     abajo, el nombre del poder deja de caer justo encima de la barra de vida
+     del jugador, que es donde antes se leía fatal. */
+  padding-bottom: 13vh;
+}
+
+/* Penumbra que apaga el tablero mientras dura el aviso. Sin ella el texto
+   compite con las cartas y las barras, y no se lee ninguno de los dos. */
+#fx-fanfarria::before {
+  content: "";
+  position: absolute;
+  inset: -13vh 0 0;
+  background: radial-gradient(circle at 50% 44%, rgba(4, 8, 12, 0.78), rgba(4, 8, 12, 0.35) 55%, transparent 78%);
+}
+
+#fx-fanfarria.activo {
+  visibility: visible;
+  animation: fanfarria-capa 1.1s ease-out forwards;
+}
+
+@keyframes fanfarria-capa {
+  0% { opacity: 1; }
+  74% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* ---------- Rayos que salen del centro ---------- */
+.fanfarria-rayos {
+  position: absolute;
+  width: 210vmax;
+  height: 210vmax;
+  opacity: 0;
+  background: repeating-conic-gradient(
+    from 0deg,
+    var(--color-poder) 0deg 5deg,
+    transparent 5deg 15deg
+  );
+  mask-image: radial-gradient(circle, transparent 14%, #000 34%, transparent 62%);
+  animation: fanfarria-rayos 0.95s ease-out forwards;
+}
+
+/* La opacidad máxima se queda en 0.4: con más, los rayos tapan el tablero y
+   durante un segundo no se sabe ni cómo va la partida. */
+@keyframes fanfarria-rayos {
+  0% { opacity: 0; transform: scale(0.2) rotate(0deg); }
+  22% { opacity: 0.4; }
+  100% { opacity: 0; transform: scale(1) rotate(42deg); }
+}
+
+/* ---------- Anillos de choque ---------- */
+.fanfarria-anillo {
+  position: absolute;
+  width: 20vmin;
+  height: 20vmin;
+  border: 0.9vmin solid var(--color-poder);
+  border-radius: 50%;
+  opacity: 0;
+  animation: fanfarria-anillo 0.7s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+}
+
+.fanfarria-anillo.anillo-tarde { animation-delay: 0.13s; border-style: dashed; }
+
+@keyframes fanfarria-anillo {
+  0% { opacity: 0.95; transform: scale(0.25); }
+  100% { opacity: 0; transform: scale(5.2); }
+}
+
+/* ---------- Bloque central ---------- */
+.fanfarria-cuerpo {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4em;
+  text-align: center;
+}
+
+.fanfarria-simbolo {
+  display: block;
+  font-size: clamp(56px, 15vmin, 148px);
+  line-height: 1;
+  filter: drop-shadow(0 0 22px var(--color-poder));
+}
+
+.fanfarria-nombre {
+  font-family: var(--fuente-titular);
+  font-size: clamp(16px, 3.4vmin, 34px);
+  letter-spacing: 0.1em;
+  color: var(--crema);
+  -webkit-text-stroke: 0.55vmin var(--tinta);
+  paint-order: stroke fill;
+  text-shadow: 0 0 26px var(--color-poder);
+  animation: fanfarria-nombre 0.85s cubic-bezier(0.1, 1.6, 0.3, 1) both;
+}
+
+.fanfarria-nota {
+  max-width: 70vw;
+  font-size: clamp(11px, 1.9vmin, 17px);
+  color: var(--crema-2);
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.6);
+  animation: fanfarria-nota 0.8s ease-out 0.16s both;
+}
+
+@keyframes fanfarria-nombre {
+  0% { opacity: 0; transform: scale(0.4) skewX(-26deg); }
+  55% { opacity: 1; transform: scale(1.12) skewX(6deg); }
+  100% { opacity: 1; transform: scale(1) skewX(0deg); }
+}
+
+@keyframes fanfarria-nota {
+  0% { opacity: 0; transform: translateY(12px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Cuando el poder lo usa la IA, todo el aviso se tiñe de rojo y entra por el
+   lado contrario: así se distingue de un golpe de suerte propio sin leer nada. */
+#fx-fanfarria.es-rival { --color-poder: var(--rojo); }
+#fx-fanfarria.es-rival .fanfarria-nombre { color: #ffd9d6; }
+#fx-fanfarria.es-rival .fanfarria-cuerpo { animation: fanfarria-lado-rival 0.8s ease-out both; }
+
+@keyframes fanfarria-lado-rival {
+  0% { transform: translateX(-14vw) rotate(-8deg); }
+  100% { transform: translateX(0) rotate(0deg); }
+}
+
+/* =============================================================================
+   UN GESTO POR PODER
+   ========================================================================== */
+
+/* PISTOLA · el símbolo retrocede por el culatazo y cruza un fogonazo. */
+.gesto-disparo .fanfarria-simbolo { animation: gesto-disparo 0.7s cubic-bezier(0.1, 1.8, 0.3, 1) both; }
+
+@keyframes gesto-disparo {
+  0% { transform: translateX(-28vw) scale(0.7); }
+  38% { transform: translateX(0) scale(1.3); }
+  46% { transform: translateX(5vw) rotate(-16deg) scale(1.15); }
+  100% { transform: translateX(0) rotate(0deg) scale(1); }
+}
+
+.gesto-disparo .fanfarria-rayos { animation-duration: 0.5s; }
+
+/* ESCUDO · cae de golpe desde arriba y rebota como una losa. */
+.gesto-muro .fanfarria-simbolo { animation: gesto-muro 0.75s cubic-bezier(0.15, 1.5, 0.35, 1) both; }
+
+@keyframes gesto-muro {
+  0% { transform: translateY(-40vh) scale(1.5); }
+  40% { transform: translateY(0) scale(1.35, 0.7); }
+  58% { transform: translateY(-2vh) scale(0.94, 1.14); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+/* DOBLE O NADA · el dado da vueltas sobre los dos ejes antes de asentarse. */
+.gesto-dados .fanfarria-simbolo { animation: gesto-dados 0.9s cubic-bezier(0.2, 1.4, 0.3, 1) both; }
+
+@keyframes gesto-dados {
+  0% { transform: scale(0.5) rotate(0deg) rotateY(0deg); }
+  70% { transform: scale(1.25) rotate(720deg) rotateY(540deg); }
+  100% { transform: scale(1) rotate(720deg) rotateY(720deg); }
+}
+
+/* ESPEJO · se voltea sobre sí mismo, como una carta que se da la vuelta. */
+.gesto-reflejo .fanfarria-simbolo { animation: gesto-reflejo 0.85s cubic-bezier(0.2, 1.3, 0.3, 1) both; }
+
+@keyframes gesto-reflejo {
+  0% { transform: rotateY(0deg) scale(0.7); }
+  50% { transform: rotateY(180deg) scale(1.3); filter: brightness(2.4) drop-shadow(0 0 30px #fff); }
+  100% { transform: rotateY(360deg) scale(1); }
+}
+
+/* GANZÚA · gira como una llave en la cerradura, a tirones. */
+.gesto-llave .fanfarria-simbolo { animation: gesto-llave 0.8s steps(1, end) both; }
+
+@keyframes gesto-llave {
+  0% { transform: rotate(-90deg) scale(0.6); }
+  25% { transform: rotate(-45deg) scale(1.1); }
+  50% { transform: rotate(0deg) scale(1.25); }
+  75% { transform: rotate(38deg) scale(1.15); }
+  100% { transform: rotate(0deg) scale(1); }
+}
+
+/* VAMPIRO · dos latidos rápidos, como una mordida. */
+.gesto-colmillos .fanfarria-simbolo { animation: gesto-colmillos 0.8s ease-out both; }
+
+@keyframes gesto-colmillos {
+  0% { transform: scale(0.4) rotate(-14deg); }
+  20% { transform: scale(1.4) rotate(6deg); }
+  36% { transform: scale(0.95); }
+  54% { transform: scale(1.3) rotate(-5deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+/* MARTILLO · cae en diagonal y el golpe sacude el nombre entero. */
+.gesto-impacto .fanfarria-simbolo { animation: gesto-impacto 0.7s cubic-bezier(0.3, 1.6, 0.4, 1) both; }
+
+@keyframes gesto-impacto {
+  0% { transform: translate(-22vw, -30vh) rotate(-120deg) scale(1.6); }
+  46% { transform: translate(0, 0) rotate(18deg) scale(1.3); }
+  60% { transform: translate(0, 1vh) rotate(-8deg) scale(1.1); }
+  100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+}
+
+.gesto-impacto .fanfarria-nombre { animation: gesto-impacto-nombre 0.8s ease-out both; }
+
+@keyframes gesto-impacto-nombre {
+  0%, 44% { opacity: 0; transform: scale(0.6); }
+  56% { opacity: 1; transform: scale(1.3) translateX(-1.2vw); }
+  66% { transform: scale(1.1) translateX(1.2vw); }
+  100% { opacity: 1; transform: scale(1) translateX(0); }
+}
+
+/* CANDADO · se cierra de golpe y se queda apretado. */
+.gesto-cerrojo .fanfarria-simbolo { animation: gesto-cerrojo 0.8s cubic-bezier(0.2, 1.7, 0.35, 1) both; }
+
+@keyframes gesto-cerrojo {
+  0% { transform: scale(2.1) rotate(16deg); opacity: 0; }
+  40% { transform: scale(1.05) rotate(-6deg); opacity: 1; }
+  56% { transform: scale(0.82, 1.18) rotate(3deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+/* RULETA · gira a toda velocidad y frena en seco, con un último tirón. */
+.gesto-giro .fanfarria-simbolo { animation: gesto-giro 1s cubic-bezier(0.1, 0.9, 0.2, 1) both; }
+
+@keyframes gesto-giro {
+  0% { transform: rotate(0deg) scale(0.6); }
+  70% { transform: rotate(1080deg) scale(1.3); }
+  84% { transform: rotate(1130deg) scale(1.2); }
+  100% { transform: rotate(1120deg) scale(1); }
+}
+
+.gesto-giro .fanfarria-anillo { animation-duration: 1s; }
+
+/* BOMBA · se hincha a punto de reventar y tiembla. */
+.gesto-explosion .fanfarria-simbolo { animation: gesto-explosion 0.9s ease-out both; }
+
+@keyframes gesto-explosion {
+  0% { transform: scale(0.4) rotate(-20deg); }
+  30% { transform: scale(1.1) rotate(8deg); }
+  45%, 55%, 65% { transform: scale(1.35) translateX(-0.06em); }
+  50%, 60%, 70% { transform: scale(1.4) translateX(0.06em); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+/* MAMAJUANA · se agita como antes de descorcharla y se inclina para servir. */
+.gesto-brindis .fanfarria-simbolo { animation: gesto-brindis 1s cubic-bezier(0.2, 1.3, 0.3, 1) both; }
+
+@keyframes gesto-brindis {
+  0% { transform: translateY(30vh) scale(0.6); }
+  30% { transform: translateY(0) scale(1.2) rotate(0deg); }
+  40%, 56% { transform: scale(1.2) rotate(-16deg); }
+  48%, 64% { transform: scale(1.2) rotate(16deg); }
+  80% { transform: scale(1.1) rotate(35deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+/* Pantallas pequeñas: el aviso sigue saliendo, pero sin tapar la partida. */
+@media (max-height: 620px), (max-width: 640px) {
+  .fanfarria-simbolo { font-size: clamp(42px, 12vmin, 88px); }
+  .fanfarria-nota { display: none; }
+}

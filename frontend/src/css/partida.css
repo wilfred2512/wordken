@@ -1,0 +1,259 @@
+/* =============================================================================
+   Pantalla de partida: paneles de vida y arena.
+   La mano y el historial viven en cartas.css.
+   ========================================================================== */
+
+.rejilla-partida {
+  display: grid;
+  grid-template-rows: auto 1fr auto auto auto;
+  gap: 10px;
+  height: 100%;
+  max-width: 1060px;
+  margin: 0 auto;
+  padding: 14px 18px 12px;
+}
+
+/* ---------- Paneles de vida ---------- */
+.hud {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 9px 13px;
+  border: 4px solid rgba(0, 0, 0, 0.35);
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.hud.es-golpeado { animation: golpe-hud 0.35s ease; }
+
+@keyframes golpe-hud {
+  0%, 100% { background: rgba(0, 0, 0, 0.3); }
+  30% { background: rgba(254, 95, 85, 0.42); }
+}
+
+.hud-linea { display: flex; align-items: center; gap: 10px; }
+
+.hud-nombre { font-family: var(--fuente-titular); font-size: 13px; letter-spacing: 0.04em; color: var(--crema); }
+
+.hud-dificultad {
+  padding: 0.16em 0.6em;
+  border-radius: 6px;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  color: var(--crema-2);
+  background: rgba(255, 255, 255, 0.11);
+}
+
+.hud-vida { margin-left: auto; font-size: 20px; font-weight: 700; color: var(--crema); }
+.hud-vida b { font-size: 24px; color: var(--amarillo); }
+.hud-vida i { font-size: 15px; font-style: normal; opacity: 0.5; }
+
+.barra {
+  position: relative;
+  height: 20px;
+  border: 3px solid rgba(0, 0, 0, 0.5);
+  border-radius: 8px;
+  background: #0d1720;
+  overflow: hidden;
+}
+
+/* La barra fantasma va por detrás y baja con retraso: se ve cuánta vida
+   acaba de perderse, no solo cuánta queda. */
+.barra-fantasma {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.28);
+  transition: width 0.55s cubic-bezier(0.3, 0, 0.2, 1) 0.18s;
+}
+
+.barra-relleno {
+  position: absolute;
+  inset: 0 auto 0 0;
+  z-index: 1;
+  width: 100%;
+  border-radius: 5px;
+  background-image: repeating-linear-gradient(115deg, rgba(255, 255, 255, 0.16) 0 8px, transparent 8px 16px);
+  transition: width 0.3s cubic-bezier(0.2, 1, 0.3, 1);
+}
+
+.barra-relleno.propio { background-color: var(--verde); box-shadow: inset 0 0 12px rgba(53, 189, 134, 0.5); }
+.barra-relleno.rival { background-color: var(--rojo); box-shadow: inset 0 0 12px rgba(254, 95, 85, 0.5); }
+.barra-relleno.baja { background-color: var(--naranja) !important; animation: latido-bajo 1s ease-in-out infinite; }
+
+@keyframes latido-bajo { 50% { filter: brightness(1.4); } }
+
+/* ---------- Insignia de cadena y sellos ---------- */
+.insignia-cadena {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0.2em 0.7em;
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.insignia-multiplicador { font-family: var(--fuente-titular); font-size: 13px; color: var(--pizarra); }
+.insignia-texto { font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--pizarra); }
+
+.insignia-cadena.nivel2 { background: var(--azul); border-color: var(--tinta); }
+.insignia-cadena.nivel3 { background: var(--naranja); border-color: var(--tinta); animation: latido-insignia 0.9s ease-in-out infinite; }
+.insignia-cadena.nivel2 span,
+.insignia-cadena.nivel3 span { color: #fff; }
+
+@keyframes latido-insignia { 50% { transform: scale(1.06); filter: brightness(1.15); } }
+
+.sellos { margin-left: auto; display: flex; gap: 6px; }
+
+.sello {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #4a6274;
+  background: rgba(0, 0, 0, 0.35);
+  transition: 0.25s;
+}
+
+.sello svg { width: 18px; height: 18px; }
+
+.sello.activo {
+  color: var(--papel);
+  background: var(--morado);
+  border-color: var(--papel);
+  box-shadow: 0 0 14px rgba(169, 108, 255, 0.75);
+  animation: sello-brinca 0.45s cubic-bezier(0.2, 1.7, 0.4, 1);
+}
+
+@keyframes sello-brinca {
+  0% { transform: scale(0.4) rotate(-25deg); }
+  60% { transform: scale(1.25) rotate(8deg); }
+}
+
+/* ---------- Arena ---------- */
+.arena {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 10px;
+  min-height: 0;
+}
+
+.hueco {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 100%;
+  min-height: 0;
+}
+
+.hueco-etiqueta { font-size: 13px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--pizarra); }
+
+/* La carta se mide por ALTURA, no por ancho.
+   Lo que se queda corto en una pantalla baja es el alto, así que si el tamaño
+   dependiera del ancho la carta seguiría siendo enorme y se metería dentro de
+   los paneles de vida. Con `flex-shrink` y `min-height:0` además puede
+   encogerse cuando el hueco aprieta, en vez de desbordarse. */
+.carta-grande {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  flex: 0 1 auto;
+  height: clamp(86px, 22vh, 200px);
+  min-height: 0;
+  width: auto;
+  aspect-ratio: 5 / 7;
+  border: 5px solid var(--tinta);
+  border-radius: 16px;
+  color: #b9c6d0;
+  background: var(--papel);
+  box-shadow: var(--sombra);
+  transition: transform 0.2s cubic-bezier(0.2, 1.5, 0.4, 1);
+}
+
+.carta-grande .cara { display: grid; place-items: center; width: 100%; height: 100%; }
+.carta-grande .cara svg { width: 62%; height: 62%; }
+.carta-grande.doble-2 { aspect-ratio: 10 / 7; }
+.carta-grande.doble-2 .cara svg { width: 82%; height: 82%; }
+
+/* Una carta girada ocupa más alto del que dice su caja, así que el giro se
+   queda pequeño para no invadir los paneles de arriba y abajo. */
+.hueco-jugador .carta-grande { transform: rotate(-3deg); }
+.hueco-rival .carta-grande { transform: rotate(3deg); }
+
+.carta-grande.pensando { animation: pensando 0.45s ease-in-out infinite; }
+
+@keyframes pensando {
+  0%, 100% { transform: rotate(4deg) scale(1); }
+  50% { transform: rotate(-4deg) scale(1.05); }
+}
+
+.carta-grande.revelar { animation: revelar 0.45s cubic-bezier(0.2, 1.6, 0.4, 1); }
+
+@keyframes revelar {
+  0% { transform: rotateY(90deg) scale(0.85); }
+  100% { transform: rotateY(0) scale(1); }
+}
+
+.carta-grande.gana { box-shadow: 0 0 0 5px var(--verde), var(--sombra); }
+.carta-grande.pierde { filter: saturate(0.35) brightness(0.7); }
+
+.centro-arena {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-width: 180px;
+}
+
+.ficha-ronda { font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--pizarra); }
+.ficha-ronda b { font-size: 17px; color: var(--amarillo); }
+
+.veredicto {
+  display: grid;
+  place-items: center;
+  min-height: 2.4em;
+  font-family: var(--fuente-titular);
+  font-size: 12px;
+  line-height: 1.6;
+  text-align: center;
+  color: var(--crema);
+  text-shadow: 0 3px 0 rgba(0, 0, 0, 0.45);
+}
+
+.veredicto.ganada { color: var(--verde); }
+.veredicto.perdida { color: var(--rojo); }
+.veredicto.empate { color: var(--pizarra); }
+.veredicto.rebote { animation: rebote 0.4s cubic-bezier(0.2, 1.7, 0.4, 1); }
+
+@keyframes rebote {
+  0% { opacity: 0; transform: scale(0.6); }
+  60% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+.contador-empates {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: max-content;
+  padding: 0.3em 0.8em;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: var(--pizarra);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.contador-empates b { font-size: 17px; color: var(--amarillo); }
+.contador-empates i { font-style: normal; opacity: 0.5; }
+.contador-empates.caliente { color: var(--naranja); border-color: var(--naranja); animation: latido-insignia 0.7s ease-in-out infinite; }
